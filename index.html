@@ -1,0 +1,843 @@
+<!--
+  Copyright (c) 2026 clavebit.com
+  Licensed under the MIT License.
+  Open Source: https://github.com
+  
+  EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO.
+--><!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Clave privada y dirección pública para Bitcoin.</title>
+    <meta name="description" content="Generar una billetera de papel gratuita de Bitcoin con la clave privada para gastar y la dirección pública para recibir">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<div class="crypto-generator-container">
+    
+    <style>
+	.aviso-instrucciones {
+    background: #fff7d6;
+    border: 3px solid #f7931a;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #92400e;
+}
+
+.aviso-instrucciones a {
+    display: inline-block;
+    background: #f7931a;
+    color: white;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.aviso-instrucciones a:hover {
+    opacity: 0.9;
+}
+        .crypto-generator-container {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            box-sizing: border-box;
+            color: #1e293b;
+        }
+
+        /* Estilos para el Título y Descripción Solicitados */
+        .header-proyecto {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+
+        .main-titulo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+        }
+
+        .main-descripcion {
+            font-size: 1rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Contenedor de Botones en Rejilla Responsiva */
+        .grid-botones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .grid-botones button {
+            border: none;
+            padding: 12px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 50px;
+        }
+
+        .grid-botones button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            filter: brightness(1.05);
+        }
+
+        .grid-botones button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        /* Estructura de los Pasos */
+        .paso-seccion {
+            margin-bottom: 24px;
+            padding: 16px 16px 16px 20px;
+            border-radius: 0 12px 12px 0;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .paso-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .paso-titulo {
+            margin: 0 0 8px 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .paso-descripcion {
+            margin: 0 0 12px 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #475569;
+        }
+
+        .paso-subetiqueta {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin: 8px 0 4px 0;
+            font-weight: 600;
+        }
+
+        /* Bloques de Código/Consola Terminal */
+        .terminal-box {
+            background: #0f172a;
+            padding: 14px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            word-break: break-all;
+            white-space: pre-wrap;
+            min-height: 24px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Sección Especial de Resumen */
+        .seccion-resumen {
+            background: #fffbeb;
+            border: 2px dashed #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        /* Colores Temáticos por Paso */
+        .p1 { border-left: 4px solid #f7931a; } .p1 .paso-tag { color: #f7931a; }
+        .p2 { border-left: 4px solid #e11d48; } .p2 .paso-tag { color: #e11d48; }
+        .p3 { border-left: 4px solid #2563eb; } .p3 .paso-tag { color: #2563eb; }
+        .p4 { border-left: 4px solid #10b981; } .p4 .paso-tag { color: #10b981; }
+        .p5 { border-left: 4px solid #0284c7; } .p5 .paso-tag { color: #0284c7; }
+        .p6 { border-left: 4px solid #06b6d4; } .p6 .paso-tag { color: #06b6d4; }
+        .p7 { border-left: 4px solid #7c3aed; } .p7 .paso-tag { color: #7c3aed; }
+
+        /* Formatos Destacados Especiales */
+        #wp-btc-binario { color: #38bdf8; font-size: 0.8rem; }
+        #wp-btc-hex { color: #34d399; }
+        #wp-btc-meta { color: #ffffff; }
+        #wp-btc-sha1, #wp-btc-sha2 { color: #94a3b8; }
+        #wp-btc-checksum { color: #a855f7; font-weight: bold; }
+        #wp-btc-paquete-hex { color: #e2e8f0; }
+        #wp-btc-wif { color: #fbbf24; background: #1e1b4b; border-color: #312e81; font-size: 1rem; }
+        #wp-btc-publica { color: #e2e8f0; font-size: 0.9rem; }
+        #wp-btc-h160 { color: #a7f3d0; font-weight: bold; font-size: 1rem; }
+        #wp-btc-witness-program { color: #f43f5e; }
+        #wp-btc-direccion { color: #c084fc; background: #2e1065; border-color: #581c87; font-size: 1.1rem; }
+        
+        /* Cajas de la sección resumen */
+        #resumen-wif { color: #fbbf24; background: #0f172a; font-size: 1.1rem; font-weight: bold; }
+        #resumen-direccion { color: #c084fc; background: #0f172a; font-size: 1.1rem; font-weight: bold; }
+    </style>
+
+    <div class="header-proyecto">
+        <h1 class="main-titulo">Clave privada y dirección pública para Bitcoin</h1>
+        <p class="main-descripcion">Generar una billetera de papel gratuita de Bitcoin con la clave privada para gastar y la dirección pública para recibir</p>
+    </div>
+	<div class="aviso-instrucciones">
+    <strong>📖 IMPORTANTE:</strong>
+    Antes de generar una cartera Bitcoin, lea las instrucciones completas de uso y seguridad.
+    <br><br>
+    <a href="https://clavebit.com/instrucciones.pdf"
+       target="_blank"
+       rel="noopener noreferrer">
+       Ver instrucciones completas (PDF)
+    </a>
+</div>
+
+    <div class="grid-botones">
+        <button onclick="ejecutarGeneradorBitcoin()" style="background: #f7931a; color: white;">
+            1. Clave privada
+        </button>
+        <button id="btn-metadatos" onclick="aplicarRedYCompresion()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            2. Añadir Metadatos
+        </button>
+        <button id="btn-checksum" onclick="calcularDobleSHA256()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            3. Doble SHA-256
+        </button>
+        <button id="btn-wif" onclick="armarPaqueteWIF()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            4. Codificar WIF
+        </button>
+        <button id="btn-publica" onclick="calcularClavePublica()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            5. Clave pública
+        </button>
+        <button id="btn-hash160" onclick="calcularHash160P2WPKH()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            6. Hash de pública
+        </button>
+        <button id="btn-direccion" onclick="generarDireccionBech32()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            7. Dirección
+        </button>
+        <button id="btn-resumen" onclick="mostrarResumenCartera()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            8. Cartera
+        </button>
+    </div>
+    
+    <div class="paso-seccion p1">
+        <span class="paso-tag">PASO 1: ENTROPÍA Y ORIGEN</span>
+        <h4 class="paso-titulo">Clave Privada (Binario y Hexadecimal)</h4>
+        <p class="paso-descripcion">La clave privada es un número aleatorio de 256 bits (32 bytes) generado aleatoriamente. Lanzamos una moneda 256 veces: si sale cara apuntamos 1 y si sale cruz anotamos 0. Además tiene que ser mayor que cero y menor que el orden del punto generador de secp256k1.</p>
+        <div id="wp-btc-binario" class="terminal-box">Clave binaria...</div>
+        <p class="paso-descripcion" style="margin-top: 12px; margin-bottom: 6px;">Para convertirla a hexadecimal agrupamos este código binario (ceros y unos) en bloques de 4 bits y obtenemos 64 caracteres en base 16 (números del 0-9 y letras de la A-F)</p>
+        <div id="wp-btc-hex" class="terminal-box">Clave hexadecimal...</div>
+    </div>
+
+    <div class="paso-seccion p2">
+        <span class="paso-tag">PASO 2: CONTEXTUALIZACIÓN</span>
+        <h4 class="paso-titulo">Red principal de Bitcoin y clave pública comprimida</h4>
+        <p class="paso-descripcion">Añadimos un byte como prefijo <span style="color: #f7931a; font-weight: bold;">80</span> (red principal de Bitcoin) y añadimos otro byte como sufijo <span style="color: #38bdf8; font-weight: bold;">01</span> (clave pública derivada será comprimida). Ahora tendremos 32 bytes de clave privada + 1 byte (80) + 1 byte (01) = 34 bytes o 68 caracteres.</p>
+        <div id="wp-btc-meta" class="terminal-box">Clave hexadecimal extendida...</div>
+    </div>
+
+    <div class="paso-seccion p3">
+        <span class="paso-tag">PASO 3: SEGURIDAD CONTRA ERRORES</span>
+        <h4 class="paso-titulo">Cálculo del Checksum (Doble SHA-256)</h4>
+        <p class="paso-descripcion">Se procesa la cadena hexadecimal extendida a través de dos rondas consecutivas del algoritmo SHA-256. Obtenemos un resumen de 32 bytes de los cuales los primeros 8 caracteres (4 bytes) del segundo resultado actúan como código de verificación.</p>
+        <div class="paso-subetiqueta">Primer SHA-256:</div>
+        <div id="wp-btc-sha1" class="terminal-box">Primer SHA-256...</div>
+        
+        <div class="paso-subetiqueta">Segundo SHA-256 (Doble Hashing):</div>
+        <div id="wp-btc-sha2" class="terminal-box">Segundo SHA-256...</div>
+        
+        <div class="paso-subetiqueta" style="color: #a855f7;">Checksum Extraído (4 bytes):</div>
+        <div id="wp-btc-checksum" class="terminal-box">Checksum...</div>
+    </div>
+
+    <div class="paso-seccion p4">
+        <span class="paso-tag">PASO 4: EMPAQUETADO HUMANO</span>
+        <h4 class="paso-titulo">Formato de Importación de Cartera (WIF)</h4>
+        <p class="paso-descripcion">Se añade el checksum al final de la clave hexadecimal extendida. Esto dará como resultado una cadena hexadecimal de 76 caracteres (38 bytes). Todo el bloque hexadecimal resultante se codifica a Base58 (alfabeto sin caracteres ambiguos como O, 0, l, I) para hacerla más corta y fácil de leer.</p>
+        <div class="paso-subetiqueta" style="color: #ec4899;">Estructura Hexadecimal Unificada:</div>
+        <div id="wp-btc-paquete-hex" class="terminal-box">Clave hexadecimal unificada...</div>
+        
+        <div class="paso-subetiqueta" style="color: #fbbf24;">Cadena Base58 WIF Final (Comienza por 'K' o 'L' cuando la clave pública es comprimida):</div>
+        <div id="wp-btc-wif" class="terminal-box">Clave privada WIF...</div>
+    </div>
+
+    <div class="paso-seccion p5">
+        <span class="paso-tag">PASO 5: IDENTIDAD EN LA BLOCKCHAIN</span>
+        <h4 class="paso-titulo">Cálculo de Clave Pública (secp256k1)</h4>
+        <p class="paso-descripcion">La clave privada hexadecimal se usa como un escalar matemático que multiplica a un punto base fijo (punto generador) en la curva elíptica. Obtenemos un punto (X,Y) -clave pública- en la curva elíptica. La forma comprimida almacena la coordenada X junto con el prefijo 02 o 03 que indica si la coordenada Y es par o impar(66 caracteres hexadecimales - 33 bytes-)</p>
+        <div id="wp-btc-publica" class="terminal-box">Clave pública...</div>
+    </div>
+
+    <div class="paso-seccion p6">
+        <span class="paso-tag">PASO 6: HASHEADO DE CLAVE PÚBLICA (HASH160)</span>
+        <h4 class="paso-titulo">Reducción Criptográfica del Identificador</h4>
+        <p class="paso-descripcion">Para reducir el tamaño del identificador y evitar exponer directamente la clave pública, la clave pública se pasa por un SHA-256 binario y el resultado inmediatamente por RIPEMD-160. Obtenemos el HASH160, que servirá como base para construir la dirección Bitcoin.</p>
+        
+       <div class="paso-subetiqueta" style="color: #60a5fa;">SHA-256 de la clave pública:</div>
+<div id="wp-btc-sha-publica" class="terminal-box">SHA-256...</div>
+
+<div class="paso-subetiqueta" style="color: #06b6d4;">RIPEMD-160 (Hash160 final de 20 bytes):</div>
+<div id="wp-btc-h160" class="terminal-box">RIPEMD-160...</div>
+
+        <div class="paso-subetiqueta" style="color: #f43f5e;">Witness Program Estructurado (Prefijo SegWit 0014 + Hash160):</div>
+        <div id="wp-btc-witness-program" class="terminal-box">Witness Program Estructurado...</div>
+    </div>
+
+    <div class="paso-seccion p7">
+        <span class="paso-tag">PASO 7: IDENTIFICADOR DE DESTINO</span>
+        <h4 class="paso-titulo">Dirección Native SegWit (Bech32 - P2WPKH - BIP 173)</h4>
+        <p class="paso-descripcion">Calculamos el Checksum: agrupamos el hash160 (20 bytes = 160 bits) en grupos de 5 bits (base 32) y obtenemos 32 valores con rangos de 0 a 31. Añadimos el prefijo 0 para indicar Native SegWit P2WPKH (versión 0) y ahora tenemos 33 valores. El prefijo bc entra en juego: se divide el valor ASCII de cada letra (b=98, c=99) en sus 3 bits superiores y 5 bits inferiores resultando con el separador intermedio 0 el vector [3, 3, 0, 2, 3]. Añadimos como prefijo estos 5 valores a los 33 que teníamos y resultan 38 valores. Además añadimos seis ceros al final (espacio reservado para el checksum) resultando 44 valores en base 32. La función matemática Polymod BCH procesa esta lista mediante una división polinómica usando un polinomio generador específico y obtenemos un número entero de 30 bits al que le aplicamos un XOR con la constante 0x3fffffff dándonos el residuo polinomial final de 30 bits, lo agrupamos en 6 bloques independientes de 5 bits cada uno y convertimos a base 32 dándonos el resultado el Checksum (6 valores en base 32).</p> 
+        
+        <p class="paso-descripcion">Transformamos los 39 valores en base 32 (33 iniciales + checksum) a texto utilizando la tabla de sustitución oficial de caracteres de Bitcoin [BIP 173] Alfabeto Bech32 siendo el primer valor 0 => q (versión de testigo) y ponemos como prefijo bc1 (42 caracteres).</p>
+        
+        <div class="paso-subetiqueta" style="color: #a78bfa;">Dirección Bech32 Definitiva:</div>
+        <div id="wp-btc-direccion" class="terminal-box">Dirección bc1q...</div>
+    </div>
+
+    <div class="seccion-resumen">
+        <h3 style="margin: 0 0 15px 0; color: #92400e; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">
+            📋 Anota tu Cartera
+        </h3>
+        
+        <div class="paso-subetiqueta" style="color: #b45309; font-weight: bold;">Clave Privada en formato WIF (guardar en secreto):</div>
+        <div id="resumen-wif" class="terminal-box">Clave privada WIF...</div>
+        
+        <div class="paso-subetiqueta" style="color: #b45309; font-weight: bold; margin-top: 15px;">Dirección Pública bc1q (compartir para recibir fondos):</div>
+        <div id="resumen-direccion" class="terminal-box">Dirección pública bc1q...</div>
+    </div>
+</div>
+
+<script>
+let claveHexBase = "";
+let claveConMetadatos = "";
+let checksumHex = "";
+let clavePublicaComprimida = "";
+let hash160BytesGlobal = null; 
+let wifGlobalString = "";
+let direccionGlobalString = "";
+
+const ALFABETO_B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+const ALFABETO_B32 = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+
+const P = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn;
+const Gx = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n;
+const Gy = 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n;
+
+function modInv(a, p) {
+    let b = p;
+    let x0 = 1n;
+    let x1 = 0n;
+
+    while (b !== 0n) {
+        const q = a / b;
+
+        [a, b] = [b, a % b];
+        [x0, x1] = [x1, x0 - q * x1];
+    }
+
+    return ((x0 % p) + p) % p;
+}
+
+function pointAdd(p, q) {
+    if (p === null) return q;
+    if (q === null) return p;
+    
+    const [x1, y1] = p;
+    const [x2, y2] = q;
+    
+    if (x1 === x2 && y1 === y2) {
+        if (y1 === 0n) return null;
+        const m = (3n * x1 * x1 % P) * modInv(2n * y1 % P, P) % P;
+        const x3 = (m * m - 2n * x1) % P;
+        const y3 = (m * (x1 - x3) - y1) % P;
+        return [x3 < 0n ? x3 + P : x3, y3 < 0n ? y3 + P : y3];
+    }
+    
+    if (x1 === x2) return null;
+    
+    const m = ((y2 - y1 + P) % P) * modInv((x2 - x1 + P) % P, P) % P;
+    const x3 = (m * m - x1 - x2) % P;
+    const y3 = (m * (x1 - x3) - y1) % P;
+    
+    return [x3 < 0n ? x3 + P : x3, y3 < 0n ? y3 + P : y3];
+}
+
+function multiplyPoint(scalar, point) {
+    let result = null;
+    let addend = point;
+    let n = BigInt(scalar);
+    
+    while (n > 0n) {
+        if (n & 1n) {
+            result = pointAdd(result, addend);
+        }
+        addend = pointAdd(addend, addend);
+        n >>= 1n;
+    }
+    return result;
+}
+
+function ripemd160(buffer) {
+
+    const msg = buffer instanceof ArrayBuffer
+        ? new Uint8Array(buffer)
+        : new Uint8Array(buffer);
+
+    function rol(x, n) {
+        return ((x << n) | (x >>> (32 - n))) >>> 0;
+    }
+
+    function f(j, x, y, z) {
+        if (j <= 15) return (x ^ y ^ z) >>> 0;
+        if (j <= 31) return ((x & y) | (~x & z)) >>> 0;
+        if (j <= 47) return ((x | ~y) ^ z) >>> 0;
+        if (j <= 63) return ((x & z) | (y & ~z)) >>> 0;
+        return (x ^ (y | ~z)) >>> 0;
+    }
+
+    const zl = [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
+        7, 4,13, 1,10, 6,15, 3,12, 0, 9, 5, 2,14,11, 8,
+        3,10,14, 4, 9,15, 8, 1, 2, 7, 0, 6,13,11, 5,12,
+        1, 9,11,10, 0, 8,12, 4,13, 3, 7,15,14, 5, 6, 2,
+        4, 0, 5, 9, 7,12, 2,10,14, 1, 3, 8,11, 6,15,13
+    ];
+
+    const zr = [
+         5,14, 7, 0, 9, 2,11, 4,13, 6,15, 8, 1,10, 3,12,
+         6,11, 3, 7, 0,13, 5,10,14,15, 8,12, 4, 9, 1, 2,
+        15, 5, 1, 3, 7,14, 6, 9,11, 8,12, 2,10, 0, 4,13,
+         8, 6, 4, 1, 3,11,15, 0, 5,12, 2,13, 9, 7,10,14,
+        12,15,10, 4, 1, 5, 8, 7, 6, 2,13,14, 0, 3, 9,11
+    ];
+
+    const sl = [
+        11,14,15,12, 5, 8, 7, 9,11,13,14,15, 6, 7, 9, 8,
+         7, 6, 8,13,11, 9, 7,15, 7,12,15, 9,11, 7,13,12,
+        11,13, 6, 7,14, 9,13,15,14, 8,13, 6, 5,12, 7, 5,
+        11,12,14,15,14,15, 9, 8, 9,14, 5, 6, 8, 6, 5,12,
+         9,15, 5,11, 6, 8,13,12, 5,12,13,14,11, 8, 5, 6
+    ];
+
+    const sr = [
+         8, 9, 9,11,13,15,15, 5, 7, 7, 8,11,14,14,12, 6,
+         9,13,15, 7,12, 8, 9,11, 7, 7,12, 7, 6,15,13,11,
+         9, 7,15,11, 8, 6, 6,14,12,13, 5,14,13,13, 7, 5,
+        15, 5, 8,11,14,14, 6,14, 6, 9,12, 9,12, 5,15, 8,
+         8, 5,12, 9,12, 5,14, 6, 8,13, 6, 5,15,13,11,11
+    ];
+
+    const KL = [
+        0x00000000,
+        0x5A827999,
+        0x6ED9EBA1,
+        0x8F1BBCDC,
+        0xA953FD4E
+    ];
+
+    const KR = [
+        0x50A28BE6,
+        0x5C4DD124,
+        0x6D703EF3,
+        0x7A6D76E9,
+        0x00000000
+    ];
+
+    let h0 = 0x67452301;
+    let h1 = 0xEFCDAB89;
+    let h2 = 0x98BADCFE;
+    let h3 = 0x10325476;
+    let h4 = 0xC3D2E1F0;
+
+    const len = msg.length;
+    const bitLen = len * 8;
+
+    const padLen = ((56 - ((len + 1) % 64)) + 64) % 64;
+    const padded = new Uint8Array(len + 1 + padLen + 8);
+
+    padded.set(msg);
+    padded[len] = 0x80;
+
+    for (let i = 0; i < 8; i++) {
+        padded[padded.length - 8 + i] =
+            Math.floor(bitLen / Math.pow(2, i * 8)) & 0xff;
+    }
+
+    for (let offset = 0; offset < padded.length; offset += 64) {
+
+        const X = new Uint32Array(16);
+
+        for (let i = 0; i < 16; i++) {
+            const j = offset + i * 4;
+            X[i] =
+                (padded[j]) |
+                (padded[j + 1] << 8) |
+                (padded[j + 2] << 16) |
+                (padded[j + 3] << 24);
+        }
+
+        let al = h0, bl = h1, cl = h2, dl = h3, el = h4;
+        let ar = h0, br = h1, cr = h2, dr = h3, er = h4;
+
+        for (let i = 0; i < 80; i++) {
+
+            let t =
+                rol(
+                    (al + f(i, bl, cl, dl) +
+                     X[zl[i]] +
+                     KL[(i / 16) | 0]) >>> 0,
+                    sl[i]
+                );
+
+            t = (t + el) >>> 0;
+
+            al = el;
+            el = dl;
+            dl = rol(cl, 10);
+            cl = bl;
+            bl = t;
+
+            t =
+                rol(
+                    (ar +
+                     f(79 - i, br, cr, dr) +
+                     X[zr[i]] +
+                     KR[(i / 16) | 0]) >>> 0,
+                    sr[i]
+                );
+
+            t = (t + er) >>> 0;
+
+            ar = er;
+            er = dr;
+            dr = rol(cr, 10);
+            cr = br;
+            br = t;
+        }
+
+        const temp = (h1 + cl + dr) >>> 0;
+
+        h1 = (h2 + dl + er) >>> 0;
+        h2 = (h3 + el + ar) >>> 0;
+        h3 = (h4 + al + br) >>> 0;
+        h4 = (h0 + bl + cr) >>> 0;
+        h0 = temp;
+    }
+
+    const out = new Uint8Array(20);
+
+    const H = [h0, h1, h2, h3, h4];
+
+    for (let i = 0; i < 5; i++) {
+        out[i * 4]     = H[i] & 0xff;
+        out[i * 4 + 1] = (H[i] >>> 8) & 0xff;
+        out[i * 4 + 2] = (H[i] >>> 16) & 0xff;
+        out[i * 4 + 3] = (H[i] >>> 24) & 0xff;
+    }
+
+    return out;
+}
+
+function bech32Polymod(values) {
+    let generator = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
+    let chk = 1;
+    for (let p = 0; p < values.length; ++p) {
+        let top = chk >> 25;
+        chk = ((chk & 0x1ffffff) << 5) ^ values[p];
+        for (let i = 0; i < 5; ++i) {
+            if ((top >> i) & 1) chk ^= generator[i];
+        }
+    }
+    return chk;
+}
+
+function bech32CreateChecksum(hrp, data) {
+    let hrpIn = [];
+    for (let i = 0; i < hrp.length; ++i) hrpIn.push(hrp.charCodeAt(i) >> 5);
+    hrpIn.push(0);
+    for (let i = 0; i < hrp.length; ++i) hrpIn.push(hrp.charCodeAt(i) & 31);
+    let values = hrpIn.concat(data).concat([0, 0, 0, 0, 0, 0]);
+    let polymod = bech32Polymod(values) ^ 1;
+    let ret = [];
+    for (let i = 0; i < 6; ++i) ret.push((polymod >> (5 * (5 - i))) & 31);
+    return ret;
+}
+
+function convertBits(data, fromBits, toBits, pad) {
+    let acc = 0, bits = 0, ret = [];
+    let maxv = (1 << toBits) - 1;
+    for (let p = 0; p < data.length; ++p) {
+        let value = data[p];
+        acc = (acc << fromBits) | value;
+        bits += fromBits;
+        while (bits >= toBits) {
+            bits -= toBits;
+            ret.push((acc >> bits) & maxv);
+        }
+    }
+    if (pad) {
+        if (bits > 0) ret.push((acc << (toBits - bits)) & maxv);
+    }
+    return ret;
+}
+
+function hexToBytes(hex) {
+    let bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+    }
+    return bytes;
+}
+
+function bytesToHex(buffer) {
+    return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function encodeBase58(buffer) {
+    let digits = [0];
+    for (let i = 0; i < buffer.length; i++) {
+        let carry = buffer[i];
+        for (let j = 0; j < digits.length; j++) {
+            carry += digits[j] << 8;
+            digits[j] = carry % 58;
+            carry = (carry / 58) | 0;
+        }
+        while (carry > 0) {
+            digits.push(carry % 58);
+            carry = (carry / 58) | 0;
+        }
+    }
+    for (let i = 0; i < buffer.length && buffer[i] === 0; i++) {
+        digits.push(0);
+    }
+    return digits.reverse().map(d => ALFABETO_B58[d]).join('');
+}
+
+function ejecutarGeneradorBitcoin() {
+claveHexBase = "";
+claveConMetadatos = "";
+checksumHex = "";
+clavePublicaComprimida = "";
+hash160BytesGlobal = null;
+wifGlobalString = "";
+direccionGlobalString = "";
+    const N_CURVA = BigInt("0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
+    let bytesAleatorios = new Uint8Array(32);
+    let valorEscalar = 0n;
+
+    while (true) {
+        window.crypto.getRandomValues(bytesAleatorios);
+        let hex = '';
+        for (let i = 0; i < bytesAleatorios.length; i++) {
+            hex += bytesAleatorios[i].toString(16).padStart(2, '0');
+        }
+        valorEscalar = BigInt("0x" + hex);
+        if (valorEscalar > 0n && valorEscalar < N_CURVA) {
+            claveHexBase = hex;
+            break;
+        }
+    }
+
+    const binario = Array.from(bytesAleatorios).map(byte => byte.toString(2).padStart(8, '0')).join('');
+    
+    document.getElementById('wp-btc-binario').innerText = binario;
+    document.getElementById('wp-btc-hex').innerText = claveHexBase;
+    
+    document.getElementById('wp-btc-meta').innerText = "Clave hexadecimal extendida...";
+    document.getElementById('wp-btc-sha1').innerText = "Primer SHA-256...";
+    document.getElementById('wp-btc-sha2').innerText = "Segundo SHA-256...";
+    document.getElementById('wp-btc-checksum').innerText = "Checksum...";
+    document.getElementById('wp-btc-paquete-hex').innerText = "Clave hexadecimal unificada...";
+    document.getElementById('wp-btc-wif').innerText = "Clave privada WIF...";
+    document.getElementById('wp-btc-publica').innerText = "Clave pública...";
+	document.getElementById('wp-btc-sha-publica').innerText = "SHA-256...";
+    document.getElementById('wp-btc-h160').innerText = "RIPEMD-160...";
+    document.getElementById('wp-btc-witness-program').innerText = "Witness Program Estructurado...";
+    document.getElementById('wp-btc-direccion').innerText = "Dirección bc1q...";
+    document.getElementById('resumen-wif').innerText = "Clave privada WIF...";
+    document.getElementById('resumen-direccion').innerText = "Dirección pública bc1q...";
+   
+    const botones = ['btn-checksum', 'btn-wif', 'btn-publica', 'btn-hash160', 'btn-direccion', 'btn-resumen'];
+    botones.forEach(id => {
+        const btn = document.getElementById(id);
+        btn.disabled = true;
+        btn.style.background = "#e2e8f0";
+        btn.style.color = "#a0aec0";
+    });
+    
+    const btnMeta = document.getElementById('btn-metadatos');
+    btnMeta.disabled = false;
+    btnMeta.style.background = "#e11d48";
+    btnMeta.style.color = "white";
+}
+
+function aplicarRedYCompresion() {
+    if (!claveHexBase) return;
+    claveConMetadatos = "80" + claveHexBase + "01";
+    document.getElementById('wp-btc-meta').innerHTML = `<span style="color: #f7931a; font-weight: bold;">80</span>${claveHexBase}<span style="color: #38bdf8; font-weight: bold;">01</span>`;
+
+    const btnCheck = document.getElementById('btn-checksum');
+    btnCheck.disabled = false; btnCheck.style.background = "#2563eb"; btnCheck.style.color = "white";
+}
+
+async function calcularDobleSHA256() {
+    if (!claveConMetadatos) return;
+    try {
+        const bytesInput = hexToBytes(claveConMetadatos);
+        const primerBuffer = await window.crypto.subtle.digest('SHA-256', bytesInput);
+        document.getElementById('wp-btc-sha1').innerText = bytesToHex(primerBuffer);
+
+        const segundoBuffer = await window.crypto.subtle.digest('SHA-256', primerBuffer);
+        const segundoHex = bytesToHex(segundoBuffer);
+        
+        const inicioChecksum = segundoHex.substring(0, 8);
+        const restoSha = segundoHex.substring(8);
+        document.getElementById('wp-btc-sha2').innerHTML = `<span style="color: #a855f7; font-weight: bold;">${inicioChecksum}</span>${restoSha}`;
+
+        checksumHex = inicioChecksum;
+        document.getElementById('wp-btc-checksum').innerText = checksumHex;
+
+        const btnWif = document.getElementById('btn-wif');
+        btnWif.disabled = false; btnWif.style.background = "#10b981"; btnWif.style.color = "white";
+    } catch (e) { console.error(e); }
+}
+
+function armarPaqueteWIF() {
+    if (!claveConMetadatos || !checksumHex) return;
+    const paqueteHexCompleto = claveConMetadatos + checksumHex;
+    document.getElementById('wp-btc-paquete-hex').innerHTML = `${claveConMetadatos}<span style="color: #a855f7; font-weight: bold;">${checksumHex}</span>`;
+
+    wifGlobalString = encodeBase58(hexToBytes(paqueteHexCompleto));
+    document.getElementById('wp-btc-wif').innerText = wifGlobalString;
+
+    const btnPub = document.getElementById('btn-publica');
+    btnPub.disabled = false; btnPub.style.background = "#0284c7"; btnPub.style.color = "white";
+}
+
+function calcularClavePublica() {
+    if (!claveHexBase) return;
+    try {
+        const d = BigInt("0x" + claveHexBase);
+        const puntoPublico = multiplyPoint(d, [Gx, Gy]);
+        
+        if (puntoPublico === null) {
+            document.getElementById('wp-btc-publica').innerText = "Error: Clave privada inválida.";
+            return;
+        }
+
+        const [x, y] = puntoPublico;
+        const xHexCompleto = x.toString(16).padStart(64, '0');
+
+        const prefijo = (y % 2n === 0n) ? "02" : "03";
+        
+        // Almacenamos de manera limpia, en minúsculas y sin espacios
+        clavePublicaComprimida = (prefijo + xHexCompleto).trim().toLowerCase();
+
+        document.getElementById('wp-btc-publica').innerHTML = `<span style="color: #ef4444; font-weight: bold;">${prefijo}</span>${xHexCompleto}`;
+
+        const btnHash = document.getElementById('btn-hash160');
+        btnHash.disabled = false;
+        btnHash.style.background = "#06b6d4";
+        btnHash.style.color = "white";
+    } catch (error) {
+        console.error("Error calculando clave pública:", error);
+        document.getElementById('wp-btc-publica').innerText = "Error en cálculo criptográfico";
+    }
+}
+
+async function calcularHash160P2WPKH() {
+    let claveLimpia = clavePublicaComprimida.trim().toLowerCase();
+    if (!claveLimpia) return;
+    
+    try {
+        // Convertir hex a bytes (33 bytes)
+        const bytesPub = hexToBytes(claveLimpia);
+        
+        // SHA-256 → devuelve ArrayBuffer de 32 bytes
+        const sha256Buffer = await window.crypto.subtle.digest('SHA-256', bytesPub);
+
+const sha256Hex = bytesToHex(sha256Buffer);
+document.getElementById('wp-btc-sha-publica').innerHTML =
+    `<span style="color:#60a5fa; font-weight:bold;">${sha256Hex}</span>`;
+
+// RIPEMD-160 sobre el SHA-256
+const hash160Bytes = ripemd160(sha256Buffer);
+
+hash160BytesGlobal = hash160Bytes;
+const hash160Hex = bytesToHex(hash160Bytes);
+
+document.getElementById('wp-btc-h160').innerHTML =
+    `<span style="color:#a7f3d0; font-weight:bold;">${hash160Hex}</span>`; 
+        const witnessProgramHex = `<span style="color:#f43f5e; font-weight:bold;">0014</span>${hash160Hex}`;
+        document.getElementById('wp-btc-witness-program').innerHTML = witnessProgramHex;
+        
+        const btnDir = document.getElementById('btn-direccion');
+        btnDir.disabled = false;
+        btnDir.style.background = "#7c3aed";
+        btnDir.style.color = "white";
+    } catch (e) { 
+        console.error("Error:", e);
+        document.getElementById('wp-btc-h160').innerText = "Error: " + e.message;
+    }
+}
+
+async function generarDireccionBech32() {
+    if (!hash160BytesGlobal) return;
+    try {
+        let data5Bits = convertBits(hash160BytesGlobal, 8, 5, true);
+        data5Bits.unshift(0); 
+
+        let checksum = bech32CreateChecksum("bc", data5Bits);
+        let combinacionDatos = data5Bits.concat(checksum);
+
+        direccionGlobalString = "bc1" + combinacionDatos.map(d => ALFABETO_B32[d]).join('');
+        
+        document.getElementById('wp-btc-direccion').innerHTML = `<span style="color:#a78bfa; font-weight:bold;">bc1q</span>${direccionGlobalString.substring(4)}`;
+
+        const btnRes = document.getElementById('btn-resumen');
+        btnRes.disabled = false; btnRes.style.background = "#d97706"; btnRes.style.color = "white";
+    } catch (e) { console.error(e); }
+}
+
+function mostrarResumenCartera() {
+    if (!wifGlobalString || !direccionGlobalString) return;
+    
+    document.getElementById('resumen-wif').innerText = wifGlobalString;
+    document.getElementById('resumen-direccion').innerText = direccionGlobalString;
+    
+    document.querySelector('.seccion-resumen').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
+<footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
+    <p>
+        © 2026 <strong>clavebit.com</strong> | 
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit" target="_blank" style="color: #f7931a; text-decoration: none;">Ver GitHub</a>
+    </p>
+</footer>
+
+</body>
+
+</html>
