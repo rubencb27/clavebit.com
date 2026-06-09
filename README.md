@@ -1,5 +1,4 @@
-# 🪙 Calculadora de Claves Privadas Bitcoin
-
+# 🪙 clavebit.com - Calculadora de Claves Privadas Bitcoin
 Una herramienta web minimalista, rápida y segura para calcular claves privadas de Bitcoin de forma local. Desarrollada exclusivamente con HTML, CSS y JavaScript puro, sin dependencias externas ni instaladores.
 
 ## 🛡️ Principios de Seguridad (Trust No One)
@@ -22,4 +21,4 @@ Para maximizar la seguridad y asegurarte de que nadie pueda interceptar tus clav
 
 Este proyecto está bajo la **Licencia MIT**. Consulta el archivo `LICENSE` para ver el texto legal completo.
 
-⚠️ **DESCARGO DE RESPONSABILIDAD (DISCLAIMER):** Este software se proporciona "tal cual", sin garantía de ningún tipo. El uso de claves privadas calculadas por software de terceros implica riesgos de pérdida de fondos si no se gestionan adecuadamente. El autor no se hace responsable de pérdidas financieras, hackeos o errores derivados del uso de esta herramienta.
+⚠️ **DESCARGO DE RESPONSABILIDAD (DISCLAIMER):** clavebit.com se proporciona "tal cual", sin garantía de ningún tipo. El uso de claves privadas calculadas por software de terceros implica riesgos de pérdida de fondos si no se gestionan adecuadamente. El autor no se hace responsable de pérdidas financieras, hackeos o errores derivados del uso de esta herramienta.
