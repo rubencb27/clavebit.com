@@ -8,15 +8,19 @@
 <html lang="es">
 <head>
     <title>Clave privada y dirección pública para Bitcoin.</title>
+	
+	 <!-- UN UNICO CSP CONSOLIDADO Y CORREGIDO -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; object-src 'none'; img-src 'self' data:;">
+    
+	
+
+    
     <meta name="description" content="Generar una billetera de papel gratuita de Bitcoin con la clave privada para gastar y la dirección pública para recibir">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
-</head>
-<body>
+	<link rel="canonical" href="https://clavebit.com" />
 
-<div class="crypto-generator-container">
-    
-    <style>
+<style>
 	
         .crypto-generator-container {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -174,14 +178,17 @@
         #resumen-direccion { color: #c084fc; background: #0f172a; font-size: 1.1rem; font-weight: bold; }
     </style>
 
+</head>
+<body>
+
+<div class="crypto-generator-container">
+    
+    
+
     <div class="header-proyecto">
         <h1 class="main-titulo">Clave privada y dirección pública para Bitcoin</h1>
-        <p class="main-descripcion">Generar una billetera de papel gratuita de Bitcoin con la clave privada para gastar y la dirección pública para recibir. <a href="https://clavebit.com/instrucciones.pdf"
-       target="_blank"
-       rel="noopener noreferrer" style="text-decoration: none; color: red;">
-       <b>Instrucciones</b></a>  de uso y seguridad</p>
+        <p class="main-descripcion">Generar una billetera de papel gratuita de Bitcoin con la clave privada para gastar y la dirección pública para recibir. <a href="./instrucciones.pdf" download style="text-decoration: none; color: red;"><b>Instrucciones</b></a> de uso y seguridad</p>
     </div>
-	
 
     <div class="grid-botones">
         <button onclick="ejecutarGeneradorBitcoin()" style="background: #f7931a; color: white;">
@@ -208,16 +215,27 @@
         <button id="btn-resumen" onclick="mostrarResumenCartera()" disabled style="background: #e2e8f0; color: #a0aec0;">
             8. Cartera
         </button>
+		
+
     </div>
+	
+	<div class="paso-seccion p1">
+    <span class="paso-tag">PASO 1: ENTROPÍA Y ORIGEN</span>
+    <h4 class="paso-titulo">Clave Privada (Binario y Hexadecimal)</h4>
+	
+	
+	 <p class="paso-descripcion">La clave privada es un número aleatorio de 256 bits (32 bytes) generado aleatoriamente. Lanzamos una moneda 256 veces: si sale cara apuntamos 1 y si sale cruz anotamos 0. Además tiene que ser mayor que cero y menor que el orden del punto generador de secp256k1.</p>
     
-    <div class="paso-seccion p1">
-        <span class="paso-tag">PASO 1: ENTROPÍA Y ORIGEN</span>
-        <h4 class="paso-titulo">Clave Privada (Binario y Hexadecimal)</h4>
-        <p class="paso-descripcion">La clave privada es un número aleatorio de 256 bits (32 bytes) generado aleatoriamente. Lanzamos una moneda 256 veces: si sale cara apuntamos 1 y si sale cruz anotamos 0. Además tiene que ser mayor que cero y menor que el orden del punto generador de secp256k1.</p>
-        <div id="wp-btc-binario" class="terminal-box">Clave binaria...</div>
-        <p class="paso-descripcion" style="margin-top: 12px; margin-bottom: 6px;">Para convertirla a hexadecimal agrupamos este código binario (ceros y unos) en bloques de 4 bits y obtenemos 64 caracteres en base 16 (números del 0-9 y letras de la A-F)</p>
+	        <div id="wp-btc-binario" class="terminal-box">Clave binaria...</div>
+
+  
+
+    <!-- Tu consola terminal original -->
+            <p class="paso-descripcion" style="margin-top: 12px; margin-bottom: 6px;">Para convertirla a hexadecimal agrupamos este código binario (ceros y unos) en bloques de 4 bits y obtenemos 64 caracteres en base 16 (números del 0-9 y letras de la A-F)</p>
         <div id="wp-btc-hex" class="terminal-box">Clave hexadecimal...</div>
-    </div>
+</div>
+
+
 
     <div class="paso-seccion p2">
         <span class="paso-tag">PASO 2: CONTEXTUALIZACIÓN</span>
@@ -297,7 +315,15 @@
     </div>
 </div>
 
+
+
 <script>
+
+
+
+
+
+
 let claveHexBase = "";
 let claveConMetadatos = "";
 let checksumHex = "";
@@ -312,6 +338,9 @@ const ALFABETO_B32 = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
 const P = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn;
 const Gx = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n;
 const Gy = 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n;
+
+
+
 
 function modInv(a, p) {
     let b = p;
@@ -799,12 +828,15 @@ function mostrarResumenCartera() {
 }
 </script>
 
+
+
 <footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
     <p>
         © 2026 <strong>clavebit.com</strong> | 
-        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
-        <a href="https://github.com/rubencb27/clavebit" target="_blank" style="color: #f7931a; text-decoration: none;">Ver GitHub</a>
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Ver GitHub</a>
     </p>
+	
 </footer>
 
 </body>
