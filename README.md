@@ -10,7 +10,7 @@ En el mundo Bitcoin, la seguridad es lo primero. Esta herramienta ha sido diseñ
 *   **Código Auditable:** Al no utilizar herramientas de empaquetado (como Webpack o Vite) ni librerías de terceros (npm), cualquiera puede revisar las líneas de código de los archivos `.js` para verificar que no existen puertas traseras.
 *   **Tag de CSP en el HTML** (Respaldo Local)
 *   **Mecanismo de Destrucción de Memoria** (Wipe)
-*   **No autocompletado:** solucionado uga de Datos por caché de entrada
+*   **No autocompletado:** solucionado fuga de Datos por caché de entrada
 
 ## 🔌 Uso Seguro en Modo Offline (Recomendado)
 
