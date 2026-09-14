@@ -1,5 +1,5 @@
 # 🪙 clavebit.com - Calculadora de Claves Privadas Bitcoin y billetera jerárquica con frase semilla.
-Una herramienta web minimalista, rápida y segura para calcular claves privadas de Bitcoin de forma local. Desarrollada exclusivamente con HTML, CSS y JavaScript puro, sin dependencias externas ni instaladores. Generador de billetera jerárquica HD (BIP39/BIP84)
+Una herramienta web minimalista, rápida y segura para calcular claves privadas de Bitcoin de forma local. Desarrollada exclusivamente con HTML, CSS y JavaScript puro, sin dependencias externas ni instaladores. Generador de billetera jerárquica HD (BIP39/BIP84). Además cuenta con dos de las herramientas más útiles para el uso del Bitcoin: consolidación de UTXOs y rescatar una transacción atascada (RBF y CPFP)
 
 
 ## 🛡️ Principios de Seguridad (Trust No One)
