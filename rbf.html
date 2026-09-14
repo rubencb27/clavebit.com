@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Rescatar transacción. RBF y CPFP</title>
+<meta name="description" content="Analizador RBF y CPFP de transacciones Bitcoin usando datos de mempool.space.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="./favicon.ico" type="image/x-icon">
+<link rel="canonical" href="https://clavebit.com/rbf.html">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://mempool.space; object-src 'none'; img-src 'self' data:;">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#1e293b;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif}
+.crypto-generator-container{max-width:900px;margin:20px auto;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);padding:24px}
+.header-proyecto{margin-bottom:25px;border-bottom:1px solid #e2e8f0;padding-bottom:20px}
+.main-titulo{font-size:1.75rem;font-weight:800;color:#0f172a;margin:0 0 8px}
+.main-descripcion{font-size:1rem;color:#64748b;margin:0;line-height:1.5}
+.paso-seccion{margin-bottom:24px;padding:16px 16px 16px 20px;border-radius:0 12px 12px 0;background:#f8fafc}
+.paso-tag{font-size:.75rem;font-weight:800;letter-spacing:.05em;display:inline-block;margin-bottom:4px}
+.paso-titulo{margin:0 0 8px;font-size:1.05rem;font-weight:700;color:#0f172a}
+.paso-descripcion{margin:0 0 12px;font-size:.85rem;line-height:1.5;color:#475569}
+.p1{border-left:4px solid #f7931a}.p1 .paso-tag{color:#f7931a}
+.p2{border-left:4px solid #2563eb}.p2 .paso-tag{color:#2563eb}
+.p3{border-left:4px solid #10b981}.p3 .paso-tag{color:#10b981}
+.p4{border-left:4px solid #7c3aed}.p4 .paso-tag{color:#7c3aed}
+.p5{border-left:4px solid #e11d48}.p5 .paso-tag{color:#e11d48}
+.p6{border-left:4px solid #8b5cf6}.p6 .paso-tag{color:#8b5cf6}
+.input-row{display:flex;gap:10px;flex-wrap:wrap}
+#txid{flex:1;min-width:240px;border:1px solid #cbd5e1;border-radius:8px;padding:13px 14px;font-family:Consolas,monospace;font-size:.9rem;outline:none}
+#txid:focus{border-color:#f7931a;box-shadow:0 0 0 3px rgba(247,147,26,.12)}
+.primary-btn{background:#f7931a;color:white;border:0;border-radius:8px;padding:13px 18px;font-weight:800;cursor:pointer}
+.primary-btn:disabled{background:#cbd5e1;cursor:not-allowed}
+.terminal-box{background:#0f172a;color:#e2e8f0;padding:14px;font-family:'SFMono-Regular',Consolas,monospace;font-size:.84rem;line-height:1.5;word-break:break-word;white-space:pre-wrap;border-radius:8px;border:1px solid #1e293b;min-height:24px}
+.status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.metric{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:13px}
+.metric-label{font-size:.72rem;color:#64748b;font-weight:700;text-transform:uppercase}
+.metric-value{font-size:1.05rem;font-weight:800;margin-top:4px;color:#0f172a;word-break:break-word}
+.metric-help{font-size:.7rem;color:#94a3b8;margin-top:4px;line-height:1.4}
+.decision{border:2px dashed #f59e0b;border-radius:12px;padding:20px;background:#fffbeb}
+.decision.good{border-color:#10b981;background:#ecfdf5}
+.decision.warn{border-color:#f59e0b;background:#fffbeb}
+.decision.bad{border-color:#e11d48;background:#fff1f2}
+.decision h3{margin:0 0 8px;color:#92400e}
+.good h3{color:#047857}.bad h3{color:#be123c}
+.bar{height:10px;background:#e2e8f0;border-radius:20px;overflow:hidden;margin:10px 0}
+.bar>span{display:block;height:100%;background:#f7931a;width:0%;transition:width .5s}
+.small{font-size:.78rem;color:#64748b;line-height:1.5}
+.hidden{display:none}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid #cbd5e1;border-top-color:#f7931a;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.confirmed-box{background:#ecfdf5;border:2px solid #10b981;border-radius:12px;padding:24px;text-align:center;margin-bottom:20px}
+.confirmed-box h2{color:#047857;margin:0 0 8px}
+.confirmed-box p{color:#065f46;margin:0}
+.output-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:8px}
+.output-table th{text-align:left;padding:6px 8px;background:#e2e8f0;color:#1e293b;font-weight:600}
+.output-table td{padding:6px 8px;border-bottom:1px solid #e2e8f0;font-family:monospace;word-break:break-all}
+.cpfp-input{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.cpfp-input label{font-weight:600;font-size:.85rem}
+.cpfp-input input{width:100px;padding:6px 8px;border:1px solid #cbd5e1;border-radius:6px;font-family:monospace}
+.cpfp-selectors{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0;align-items:center}
+.cpfp-selectors>div{display:flex;align-items:center;gap:6px}
+.cpfp-selectors select,.cpfp-selectors input{padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;background:white;font-size:.85rem}
+#cpfpOutput{max-width:280px}
+.feasibility{margin-top:10px;padding:10px;border-radius:8px;font-size:.82rem;line-height:1.5;display:none}
+.feasibility.ok{display:block;background:#ecfdf5;border-left:3px solid #10b981;color:#065f46}
+.feasibility.bad{display:block;background:#fff1f2;border-left:3px solid #e11d48;color:#9f1239}
+@media(max-width:600px){.crypto-generator-container{margin:0;border-radius:0;padding:16px}.main-titulo{font-size:1.45rem}.input-row{flex-direction:column}.primary-btn{width:100%}}
+</style>
+</head>
+<body>
+
+<div class="crypto-generator-container">
+
+  <div class="header-proyecto">
+    <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com" rel="noopener" style="text-decoration: none;color: orange;">Clave privada, pública y dirección</a></p>
+    <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/billeterahd.html" rel="noopener" style="text-decoration: none;color: orange;">Billetera HD (BIP39/BIP84)</a></p>
+    <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/radar.html" rel="noopener" style="text-decoration: none;color: orange;">Consolidación de UTXOs</a></p>
+    <h1 class="main-titulo">Rescatar transacción. RBF y CPFP</h1>
+  
+    <p class="main-descripcion">Al hacer una transacción de BTC esta entra en una sala de espera (mempool) antes de confirmarse y el minero la incluye en un bloque. 
+    Si la tasa de comisión que pagaste es más baja que la de las transacciones que están en cola tendrás que esperar. Disponemos de dos herramientas para acelerar la transacción: RBF y CPFP.</p><br>
+  </div>
+
+  <div class="paso-seccion p1">
+    <span class="paso-tag">PASO 1: INTRODUCE LA TRANSACCIÓN</span>
+    <h4 class="paso-titulo">Analizar TXID</h4>
+    <p class="paso-descripcion">No introduzcas claves privadas ni datos de tu cartera. Solo necesitamos el identificador público de la transacción.</p>
+    <div class="input-row">
+      <input id="txid" autocomplete="off" spellcheck="false" placeholder="TXID de 64 caracteres hexadecimales">
+      <button class="primary-btn" id="analizarBtn" onclick="analizarTransaccion()">🔎 Analizar</button>
+    </div>
+    <div id="errorBox" class="terminal-box hidden" style="margin-top:12px;color:#fda4af;"></div>
+  </div>
+
+  <div id="resultado" class="hidden">
+    <!-- Mensaje para transacciones confirmadas -->
+    <div id="confirmedMessage" class="confirmed-box hidden">
+      <h2>✅ Transacción Confirmada</h2>
+      <p>Esta transacción ya ha sido incluida en un bloque. No necesitas hacer nada más.</p>
+      <p style="margin-top:8px;font-size:.85rem;">Puedes ver los detalles en <a href="#" id="mempoolLink" target="_blank" rel="noopener" style="color:#10b981;">mempool.space</a>.</p>
+    </div>
+
+    <!-- Secciones que solo se muestran si NO está confirmada -->
+    <div id="analisisNoConfirmado">
+      <div class="paso-seccion p2">
+        <span class="paso-tag">PASO 2: DIAGNÓSTICO</span>
+        <h4 class="paso-titulo">Estado de la transacción</h4>
+        <p>RBF (Replace-By-Fee) significa "reemplazo por una tasa mayor": consiste en sustituir la transacción por otra con tasa de comisión mayor. Tu billetera debe haber creado la transacción inicial permitiendo reemplazo y además este debe cumplir ciertas reglas.</p>
+        <div class="status-grid">
+          <div class="metric"><div class="metric-label">Estado</div><div class="metric-value" id="mEstado">—</div></div>
+          <div class="metric"><div class="metric-label">Comisión</div><div class="metric-value" id="mFee">—</div></div>
+          <div class="metric"><div class="metric-label">Tamaño virtual</div><div class="metric-value" id="mVsize">—</div></div>
+          <div class="metric"><div class="metric-label">Tasa de comisión</div><div class="metric-value" id="mRate">—</div></div>
+          <div class="metric"><div class="metric-label">RBF directo (BIP125)</div><div class="metric-value" id="mRbf">—</div></div>
+          <div class="metric"><div class="metric-label">Confirmaciones</div><div class="metric-value" id="mConf">—</div></div>
+        </div>
+      </div>
+
+      <div class="paso-seccion p3">
+        <span class="paso-tag">PASO 3: SITUACIÓN DEL MEMPOOL</span>
+        <h4 class="paso-titulo">¿Dónde está tu transacción respecto al mercado?</h4>
+        <div class="status-grid">
+          <div class="metric"><div class="metric-label">Próximo bloque ≈10 min</div><div class="metric-value" id="fHigh">—</div></div>
+          <div class="metric"><div class="metric-label">Referencia ~30 min</div><div class="metric-value" id="fMid">—</div></div>
+          <div class="metric"><div class="metric-label">Referencia ~1 hora</div><div class="metric-value" id="fLow">—</div></div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="small">Comparación visual de la tasa de comisión actual con la referencia para el próximo bloque. La barra es orientativa, no una garantía de confirmación.</div>
+          <div class="bar"><span id="rateBar"></span></div>
+          <div class="small" id="rateComment">—</div>
+          <div id="rateInterpretation" class="small" style="margin-top:6px;font-weight:600;color:#0f172a;">—</div>
+        </div>
+      </div>
+
+      <div class="paso-seccion p4">
+        <span class="paso-tag">PASO 4: RBF / CPFP</span>
+        <h4 class="paso-titulo">Motor de decisión</h4>
+        <div id="decision" class="decision">
+          <h3 id="decisionTitle">Analizando…</h3>
+          <p id="decisionText" class="paso-descripcion" style="margin-bottom:8px">—</p>
+          <div class="status-grid">
+            <div class="metric">
+              <div class="metric-label">Tasa mínima orientativa para reemplazo</div>
+              <div class="metric-value" id="targetMin">—</div>
+              <div class="metric-help">Es una referencia orientativa. La política de RBF también depende de la comisión absoluta y de la comisión mínima adicional que debe pagar una nueva transacción para poder reemplazar a otra.</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Tasa de referencia para próximo bloque</div>
+              <div class="metric-value" id="targetRec">—</div>
+              <div class="metric-help">Referencia de mempool.space para nuevas transacciones. No garantiza un tiempo exacto de confirmación.</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Sats extra estimados (aprox.)</div>
+              <div class="metric-value" id="extraFee">—</div>
+              <div class="metric-help">Estimación simple de la diferencia de la tasa de comisión. Una transacción RBF real debe respetar además las reglas de reemplazo.</div>
+            </div>
+          </div>
+        </div>
+        <p class="small" style="margin-top:12px">Estos valores son orientativos. Si tu cartera soporta RBF, ella misma aplicará las reglas necesarias al crear el reemplazo. Esta herramienta no sustituye el análisis de tu wallet.</p>
+      </div>
+
+      <div class="paso-seccion p5">
+        <span class="paso-tag">PASO 5: CPFP Y DATOS AVANZADOS</span>
+        <p>CPFP (Child Pays For Parent) significa el hijo paga por el padre: se crea una segunda transacción, llamada transacción hija, que utiliza como entrada una salida de la transacción que está atascada (padre) de forma que se pague una tarifa suficientemente alta para que, al considerar ambas transacciones juntas, el conjunto tenga una tarifa a considerar por los mineros.</p>
+        <h4 class="paso-titulo">¿Existe presión por ancestros o descendientes?</h4>
+        <div id="cpfpBox" class="terminal-box">Consultando…</div>
+        <div style="margin-top:12px" class="small">
+          Si la transacción no se puede o no conviene reemplazarla, CPFP es una alternativa si controlas una salida no gastada de la misma. Para una nueva hija, el paquete relevante está formado por la hija y sus ancestros no confirmados; los descendientes existentes del padre no se suman automáticamente al paquete de la nueva hija.
+        </div>
+        <div class="small" style="margin-top:12px;color:#94a3b8;">
+          Nota: esta herramienta detecta RBF <em>directo</em> (señalizado en esta misma transacción). El RBF <em>heredado</em> (por ancestros que señalizan reemplazabilidad, BIP125 regla 2) no se analiza por requerir consultas recursivas a toda la cadena.
+        </div>
+      </div>
+
+      <div class="paso-seccion p6">
+        <span class="paso-tag">PASO 6: SALIDAS Y CPFP PRECISO</span>
+        <h4 class="paso-titulo">Salidas de la transacción</h4>
+        <div id="outputsContainer">
+          <div class="terminal-box" id="outputsBox">Cargando salidas…</div>
+        </div>
+        <div style="margin-top:16px">
+          <h5 style="margin:0 0 8px;font-size:.95rem;">Calcular tarifa CPFP</h5>
+          <p class="small">
+            Si controlas alguna de las salidas de arriba, puedes crear una transacción hija (CPFP) para acelerar la confirmación.
+            Selecciona la salida que vas a gastar, el tipo de transacción y el número de entradas y salidas que tendrá la transacción hija,
+            y calcularemos automáticamente un tamaño estimado y la tarifa necesaria.
+          </p>
+
+          <div class="cpfp-selectors">
+            <div>
+              <label for="cpfpOutput">Salida a gastar:</label>
+              <select id="cpfpOutput">
+                <option value="">— ninguna —</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cpfp-selectors">
+            <div>
+              <label for="txType">Tipo:</label>
+              <select id="txType">
+                <option value="segwit">SegWit (P2WPKH)</option>
+                <option value="legacy">Legacy (P2PKH)</option>
+                <option value="taproot">Taproot (P2TR)</option>
+              </select>
+            </div>
+            <div>
+              <label for="inputsCount">Inputs:</label>
+              <input type="number" id="inputsCount" min="1" max="10" value="1" style="width:60px;">
+            </div>
+            <div>
+              <label for="outputsCount">Outputs:</label>
+              <input type="number" id="outputsCount" min="1" max="5" value="2" style="width:60px;">
+            </div>
+            <div>
+              <span style="font-weight:600;font-size:.85rem;">Tamaño estimado: <span id="estimatedSize">—</span> vB</span>
+            </div>
+          </div>
+
+          <div class="cpfp-input">
+            <button class="primary-btn" id="calcularCpfpBtn" style="padding:8px 14px;font-size:.8rem;">Calcular CPFP</button>
+          </div>
+          <div id="feasibility" class="feasibility"></div>
+          <div id="cpfpResult" class="terminal-box" style="margin-top:10px;background:#1e293b;color:#cbd5e1;">
+            Pulsa "Calcular CPFP" para obtener la tarifa objetivo.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const API = "https://mempool.space/api";
+
+  // Límites de polvo (dust limit) por tipo de script de salida.
+  // Se usan para comprobar que tras pagar la comisión de la hija queda
+  // una salida por encima del mínimo aceptado por los nodos.
+  const DUST_LIMIT = {
+    segwit: 294,
+    legacy: 546,
+    taproot: 330
+  };
+
+  // Tarifa mínima de relay aceptada por los nodos Bitcoin Core (sat/vB).
+  const MIN_RELAY_FEE = 1;
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function sat(v) {
+    const num = Number(v);
+    if (!Number.isFinite(num) || num < 0) return "No disponible";
+    return num.toLocaleString("es-ES") + " sats";
+  }
+
+  function validateTxid(txid) {
+    return /^[0-9a-fA-F]{64}$/.test(txid);
+  }
+
+  async function getJSON(url) {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status);
+    }
+    return response.json();
+  }
+
+  function directRbf(tx) {
+    return Array.isArray(tx?.vin) && tx.vin.some(v => Number(v.sequence) < 0xfffffffe);
+  }
+
+  async function getRbfTimeline(txid) {
+    try {
+      // Endpoint de la línea temporal RBF (mempool.space v1).
+      return await getJSON(`${API}/v1/tx/${txid}/rbf`);
+    } catch (e) {
+      console.warn("No se pudo obtener la línea temporal RBF:", e.message);
+      return null;
+    }
+  }
+
+  // Robusto frente a distintos esquemas de respuesta del endpoint RBF.
+  function hasRbfHistory(rbfData) {
+    if (!rbfData) return false;
+    if (Array.isArray(rbfData)) return rbfData.length > 0;
+    if (typeof rbfData === "object") {
+      if (Array.isArray(rbfData.replacements) && rbfData.replacements.length > 0) return true;
+      if (Array.isArray(rbfData.replaces) && rbfData.replaces.length > 0) return true;
+      if (Array.isArray(rbfData.replacedBy) && rbfData.replacedBy.length > 0) return true;
+      if (Array.isArray(rbfData.txs) && rbfData.txs.length > 0) return true;
+      if (Array.isArray(rbfData.chain) && rbfData.chain.length > 0) return true;
+    }
+    return false;
+  }
+
+  function formatStatus(status) {
+    return status?.confirmed ? "✅ CONFIRMADA" : "⏳ SIN CONFIRMAR";
+  }
+
+  function getTxVsize(tx) {
+    const vsize = Number(tx?.vsize);
+    if (Number.isFinite(vsize) && vsize > 0) return vsize;
+
+    const weight = Number(tx?.weight);
+    if (Number.isFinite(weight) && weight > 0) return Math.ceil(weight / 4);
+
+    const size = Number(tx?.size);
+    if (Number.isFinite(size) && size > 0) return size;
+
+    return 0;
+  }
+
+  function calcFeeRate(tx) {
+    const vsize = getTxVsize(tx);
+    const fee = Number(tx?.fee);
+    if (vsize <= 0 || !Number.isFinite(fee) || fee < 0) return 0;
+    return fee / vsize;
+  }
+
+  function safeNumber(val, fallback = 0) {
+    const num = Number(val);
+    return Number.isFinite(num) && num >= 0 ? num : fallback;
+  }
+
+  function chooseTargets(current, fees) {
+    const fastest = safeNumber(fees?.fastestFee, 0);
+    if (fastest <= 0 || current < 0) {
+      return { minimum: Math.ceil(current + 1), recommended: 0, fastest: 0 };
+    }
+    return {
+      minimum: Math.ceil(current + 1),
+      recommended: Math.max(Math.ceil(current + 1), fastest),
+      fastest
+    };
+  }
+
+  function setDecision(kind, title, text) {
+    const d = $("decision");
+    d.className = "decision " + kind;
+    $("decisionTitle").textContent = title;
+    $("decisionText").textContent = text;
+  }
+
+  // CORREGIDO: comprueba longitudes > 0 para evitar falsos positivos
+  // cuando la API devuelve arrays vacíos.
+  function hasCpfpData(cpfp) {
+    if (!cpfp || typeof cpfp !== "object") return false;
+    if (Array.isArray(cpfp.ancestors) && cpfp.ancestors.length > 0) return true;
+    if (Array.isArray(cpfp.descendants) && cpfp.descendants.length > 0) return true;
+    if (cpfp.bestDescendant) return true;
+    if (Number(cpfp.ancestor_count) > 0) return true;
+    if (Number(cpfp.descendant_count) > 0) return true;
+    return false;
+  }
+
+  function getAncestorCount(cpfp) {
+    if (Array.isArray(cpfp?.ancestors)) return cpfp.ancestors.length;
+    return safeNumber(cpfp?.ancestor_count, 0);
+  }
+
+  function getDescendantCount(cpfp) {
+    if (Array.isArray(cpfp?.descendants)) return cpfp.descendants.length;
+    if (cpfp?.bestDescendant) return 1;
+    return safeNumber(cpfp?.descendant_count, 0);
+  }
+
+  function getBestDescendantRate(cpfp) {
+    const bd = cpfp?.bestDescendant;
+    if (!bd) return 0;
+    if (typeof bd === "object") {
+      return safeNumber(bd.feePerVsize ?? bd.effectiveFeePerVsize ?? bd.fee_rate, 0);
+    }
+    return 0;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  let currentTxData = null;
+  let currentFees = null;
+  let currentCpfp = null;
+  let currentRate = 0;
+  let currentVsize = 0;
+  let currentRbfDirect = false;
+  let currentRbfHistory = false;
+  let currentOutputs = [];   // { index, value, address, spent }
+
+  function clampCount(value, min, max) {
+    const n = Number.parseInt(value, 10);
+    if (!Number.isFinite(n)) return min;
+    return Math.min(max, Math.max(min, n));
+  }
+
+  // Estimación conservadora del tamaño de una hija.
+  // Son valores orientativos: el tamaño exacto depende de la plantilla/script
+  // que firme la wallet.
+  function estimateChildSize() {
+    const txType = $("txType").value;
+    const inputs = clampCount($("inputsCount").value, 1, 10);
+    const outputs = clampCount($("outputsCount").value, 1, 5);
+
+    $("inputsCount").value = inputs;
+    $("outputsCount").value = outputs;
+
+    let inputSize;
+    let outputSize;
+    let overhead;
+
+    switch (txType) {
+      case "segwit":
+        inputSize = 68;
+        outputSize = 31;
+        overhead = 10.5;
+        break;
+      case "legacy":
+        inputSize = 148;
+        outputSize = 34;
+        overhead = 10;
+        break;
+      case "taproot":
+        inputSize = 58;
+        outputSize = 43;
+        overhead = 10.5;
+        break;
+      default:
+        inputSize = 68;
+        outputSize = 31;
+        overhead = 10.5;
+    }
+
+    return Math.ceil(overhead + inputs * inputSize + outputs * outputSize);
+  }
+
+  function updateEstimatedSize() {
+    const size = estimateChildSize();
+    $("estimatedSize").textContent = size;
+    return size;
+  }
+
+  function getSelectedOutput() {
+    const select = $("cpfpOutput");
+    const idx = Number.parseInt(select.value, 10);
+    if (!Number.isFinite(idx)) return null;
+    return currentOutputs.find(o => o.index === idx) || null;
+  }
+
+  // Extrae TXIDs de distintas formas posibles de la respuesta de mempool.space.
+  function extractTxid(item) {
+    if (typeof item === "string" && /^[0-9a-fA-F]{64}$/.test(item)) return item.toLowerCase();
+    if (!item || typeof item !== "object") return null;
+
+    const candidates = [
+      item.txid,
+      item.tx_id,
+      item.id,
+      item.hash
+    ];
+
+    for (const candidate of candidates) {
+      if (typeof candidate === "string" && /^[0-9a-fA-F]{64}$/.test(candidate)) {
+        return candidate.toLowerCase();
+      }
+    }
+    return null;
+  }
+
+  // Obtiene los ancestros no confirmados que mempool.space proporciona.
+  // Si la API ya devuelve fee/vsize en cada elemento, no hace consultas extra.
+  // Si solo devuelve TXIDs, los consulta en /tx/{txid}.
+  async function getUnconfirmedAncestors(cpfp, parentTxid) {
+    const raw = Array.isArray(cpfp?.ancestors) ? cpfp.ancestors : [];
+    if (!raw.length) {
+      return { txs: [], complete: true };
+    }
+
+    const parentId = String(parentTxid || "").toLowerCase();
+    const seen = new Set();
+    const txs = [];
+    const idsToFetch = [];
+
+    for (const item of raw) {
+      const id = extractTxid(item);
+
+      // La respuesta de algunas versiones puede incluir el propio padre.
+      // El padre se añade después de forma explícita, así que no lo duplicamos.
+      if (id && id === parentId) continue;
+      if (id && seen.has(id)) continue;
+      if (id) seen.add(id);
+
+      const fee = safeNumber(item?.fee, -1);
+      const vsize = getTxVsize(item);
+
+      if (id && fee >= 0 && vsize > 0) {
+        txs.push({ txid: id, fee, vsize });
+      } else if (id) {
+        idsToFetch.push(id);
+      }
+    }
+
+    const fetched = await Promise.allSettled(
+      [...new Set(idsToFetch)].map(id => getJSON(`${API}/tx/${id}`))
+    );
+
+    let complete = true;
+
+    fetched.forEach((result, i) => {
+      if (result.status !== "fulfilled") {
+        complete = false;
+        return;
+      }
+
+      const tx = result.value;
+      const id = extractTxid(tx) || [...new Set(idsToFetch)][i];
+      const fee = safeNumber(tx?.fee, -1);
+      const vsize = getTxVsize(tx);
+
+      if (fee >= 0 && vsize > 0) {
+        txs.push({ txid: id, fee, vsize });
+      } else {
+        complete = false;
+      }
+    });
+
+    // Si había elementos sin TXID, no podemos asegurar el paquete completo.
+    if (raw.some(item => !extractTxid(item))) complete = false;
+
+    // El número declarado por la API puede revelar que faltan ancestros.
+    const declared = safeNumber(
+      cpfp?.ancestor_count,
+      Array.isArray(cpfp?.ancestors) ? cpfp.ancestors.length : 0
+    );
+    if (declared > txs.length) complete = false;
+
+    // Elimina duplicados por seguridad.
+    const unique = new Map();
+    for (const tx of txs) unique.set(tx.txid, tx);
+
+    return { txs: [...unique.values()], complete };
+  }
+
+  // Calcula el paquete que realmente importa para una NUEVA hija:
+  // todos los ancestros no confirmados + el padre + la hija.
+  //
+  // Los descendientes existentes NO se suman aquí: no son ancestros de la
+  // nueva hija y no pasan a formar parte automáticamente de su paquete.
+  async function buildCpfpPackage(parentTxid, childSize) {
+    const parentFee = safeNumber(currentTxData?.fee, 0);
+    const parentSize = currentVsize;
+
+    const ancestorInfo = await getUnconfirmedAncestors(currentCpfp, parentTxid);
+
+    let packageSize = parentSize;
+    let packageFee = parentFee;
+
+    for (const tx of ancestorInfo.txs) {
+      packageSize += tx.vsize;
+      packageFee += tx.fee;
+    }
+
+    return {
+      ancestorCount: ancestorInfo.txs.length,
+      complete: ancestorInfo.complete,
+      parentSize,
+      parentFee,
+      ancestorSize: packageSize - parentSize,
+      ancestorFee: packageFee - parentFee,
+      packageBeforeChildSize: packageSize,
+      packageBeforeChildFee: packageFee,
+      totalWithChildSize: packageSize + childSize,
+      txs: ancestorInfo.txs
+    };
+  }
+
+  async function calcularCPFP() {
+    const feasBox = $("feasibility");
+    feasBox.className = "feasibility";
+    feasBox.textContent = "";
+
+    if (!currentTxData || !currentFees) {
+      $("cpfpResult").textContent =
+        "Analiza primero una transacción y asegúrate de que las tarifas de mempool.space estén disponibles.";
+      return;
+    }
+
+    const childSize = updateEstimatedSize();
+    const targetRate = safeNumber(currentFees.fastestFee, 0);
+    const txType = $("txType").value;
+    const dustLimit = DUST_LIMIT[txType] || 294;
+
+    if (childSize <= 0 || currentVsize <= 0 || targetRate <= 0) {
+      $("cpfpResult").textContent =
+        "No hay datos suficientes para calcular el CPFP con fiabilidad.";
+      return;
+    }
+
+    const parentTxid = String(currentTxData.txid || $("txid").value || "").toLowerCase();
+
+    // Construimos el paquete correcto para una nueva hija.
+    const pkg = await buildCpfpPackage(parentTxid, childSize);
+
+    const totalFeeNeeded = Math.ceil(targetRate * pkg.totalWithChildSize);
+
+    // La hija paga SOLO la comisión que falta para llevar el paquete
+    // (ancestros + padre + hija) a la tasa objetivo.
+    let childFeeNeeded = Math.max(0, totalFeeNeeded - pkg.packageBeforeChildFee);
+
+    // La hija también debe superar la política mínima de relay.
+    const childFeeMin = Math.ceil(MIN_RELAY_FEE * childSize);
+    childFeeNeeded = Math.max(childFeeNeeded, childFeeMin);
+
+    const childRate = childFeeNeeded / childSize;
+    const resultingPackageRate =
+      (pkg.packageBeforeChildFee + childFeeNeeded) / pkg.totalWithChildSize;
+
+    const lines = [
+      `📦 Ancestros no confirmados incluidos: ${pkg.ancestorCount}`,
+      `📊 Tamaño de ancestros: ${pkg.ancestorSize} vB`,
+      `📊 Tamaño del padre: ${pkg.parentSize} vB`,
+      `📊 Tamaño de la hija (estimado): ${childSize} vB (tipo ${txType})`,
+      `📊 Tamaño total del paquete: ${pkg.totalWithChildSize} vB`,
+      `💰 Comisión de ancestros: ${sat(pkg.ancestorFee)}`,
+      `💰 Comisión del padre: ${sat(pkg.parentFee)}`,
+      `🎯 Tasa objetivo: ${targetRate.toFixed(1)} sat/vB (referencia próximo bloque)`,
+      `💰 Comisión total necesaria del paquete: ${sat(totalFeeNeeded)}`,
+      `➡️ Comisión estimada de la hija: ${sat(childFeeNeeded)}`,
+      `➡️ Tasa estimada de la hija: ${childRate.toFixed(2)} sat/vB`,
+      `📈 Tasa resultante del paquete: ${resultingPackageRate.toFixed(2)} sat/vB`
+    ];
+
+    if (!pkg.complete) {
+      lines.push(
+        "",
+        "⚠️ No se pudo reconstruir con certeza todo el conjunto de ancestros desde la respuesta disponible de la API.",
+        "El cálculo mostrado es orientativo y NO debe interpretarse como un cálculo exacto del paquete."
+      );
+    } else {
+      lines.push(
+        "",
+        "✅ Cálculo basado en los ancestros no confirmados disponibles.",
+        "Los descendientes existentes no se suman al paquete de esta nueva hija."
+      );
+    }
+
+    lines.push(
+      "",
+      "💡 La wallet debe crear una transacción hija válida gastando una salida que controles."
+    );
+
+    $("cpfpResult").textContent = lines.join("\n");
+
+    // Comprobación de financiación.
+    const sel = getSelectedOutput();
+
+    if (!sel) {
+      feasBox.className = "feasibility";
+      return;
+    }
+
+    if (sel.spent) {
+      feasBox.className = "feasibility bad";
+      feasBox.textContent =
+        `La salida #${sel.index} ya está gastada. No puedes usarla para CPFP.`;
+      return;
+    }
+
+    // Si hay más de una entrada, no conocemos el valor de las otras entradas.
+    // Por tanto NO podemos afirmar que la comisión sea financiable solo con
+    // la salida seleccionada.
+    const inputs = clampCount($("inputsCount").value, 1, 10);
+    const outputs = clampCount($("outputsCount").value, 1, 5);
+
+    if (inputs > 1) {
+      feasBox.className = "feasibility ok";
+      feasBox.textContent =
+        `ℹ️ La salida #${sel.index} está sin gastar. La comisión estimada es ${sat(childFeeNeeded)}. ` +
+        `Como has seleccionado ${inputs} entradas, esta herramienta no conoce el valor de las otras entradas ` +
+        `ni los importes de las salidas de la hija, por lo que no puede certificar la financiación final.`;
+      return;
+    }
+
+    // Para una sola entrada, la suma de las salidas de la hija no puede superar
+    // entrada - fee. Si hay varias salidas, dejamos al menos dust para cada una.
+    const minimumOutputsValue = outputs * dustLimit;
+    const maxChildFee = sel.value - minimumOutputsValue;
+
+    if (sel.value < minimumOutputsValue) {
+      feasBox.className = "feasibility bad";
+      feasBox.textContent =
+        `⚠️ La salida #${sel.index} (${sat(sel.value)}) no permite crear una hija con ` +
+        `${outputs} salidas manteniendo cada una por encima del límite de polvo (${dustLimit} sats).`;
+      return;
+    }
+
+    if (childFeeNeeded > maxChildFee) {
+      feasBox.className = "feasibility bad";
+      feasBox.textContent =
+        `⚠️ CPFP NO VIABLE con la salida #${sel.index}: necesita ${sat(childFeeNeeded)} de comisión, ` +
+        `pero con ${outputs} salidas y un mínimo de ${dustLimit} sats por salida, ` +
+        `la financiación máxima disponible para la comisión es ${sat(maxChildFee)}. ` +
+        `Considera usar más entradas controladas por ti, reducir salidas, o utilizar RBF.`;
+    } else {
+      const remaining = sel.value - childFeeNeeded;
+      feasBox.className = "feasibility ok";
+      feasBox.textContent =
+        `✅ La comisión es financiable con la salida #${sel.index}: quedarían ${sat(remaining)} ` +
+        `para repartir entre las ${outputs} salidas de la hija, manteniendo al menos ` +
+        `${dustLimit} sats por salida.`;
+    }
+  }
+
+  async function getOutspends(txid) {
+    try {
+      return await getJSON(`${API}/tx/${txid}/outspends`);
+    } catch (e) {
+      console.warn("No se pudo obtener el estado de las salidas:", e.message);
+      return null;
+    }
+  }
+
+  function renderOutputs(tx, outspends) {
+    const container = $("outputsBox");
+
+    if (!Array.isArray(tx?.vout) || tx.vout.length === 0) {
+      container.textContent = "No se encontraron salidas.";
+      currentOutputs = [];
+      populateOutputSelector();
+      return;
+    }
+
+    let html = '<table class="output-table"><thead><tr><th>#</th><th>Dirección</th><th>Cantidad</th><th>Estado</th></tr></thead><tbody>';
+    currentOutputs = [];
+
+    tx.vout.forEach((out, idx) => {
+      const addr = out?.scriptpubkey_address || "OP_RETURN / sin dirección";
+      const sats = safeNumber(out?.value, 0);
+      const spentInfo = Array.isArray(outspends) ? outspends[idx] : null;
+      const spent = spentInfo?.spent === true;
+      const isOpReturn = out?.scriptpubkey_type === "op_return" ||
+        (!out?.scriptpubkey_address && String(out?.scriptpubkey || "").toLowerCase().startsWith("6a"));
+
+      currentOutputs.push({
+        index: idx,
+        value: sats,
+        address: addr,
+        spent: spent,
+        isOpReturn: isOpReturn
+      });
+
+      const statusText = spent
+        ? `🔴 Gastado${spentInfo?.txid ? ` (${escapeHtml(String(spentInfo.txid).slice(0, 12))}…)` : ""}`
+        : outspends
+          ? "🟢 No gastado"
+          : "⚪ Estado no disponible";
+
+      html += `<tr>
+        <td>${idx}</td>
+        <td>${escapeHtml(addr)}</td>
+        <td>${(sats / 1e8).toFixed(8)} BTC<br><span class="small">${sats.toLocaleString("es-ES")} sats</span></td>
+        <td>${statusText}</td>
+      </tr>`;
+    });
+
+    html += "</tbody></table>";
+    container.innerHTML = html;
+
+    populateOutputSelector();
+  }
+
+  // Rellena el desplegable de salidas a gastar con las salidas no gastadas.
+  function populateOutputSelector() {
+    const select = $("cpfpOutput");
+    select.innerHTML = '<option value="">— ninguna —</option>';
+
+    currentOutputs.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = String(o.index);
+      opt.textContent = `#${o.index} — ${o.value.toLocaleString("es-ES")} sats — ${o.address.slice(0, 14)}…${o.spent ? " (gastado)" : o.isOpReturn ? " (OP_RETURN)" : ""}`;
+      if (o.spent || o.isOpReturn) opt.disabled = true;
+      select.appendChild(opt);
+    });
+  }
+
+  function setFeeDisplays(fees) {
+    const hasFast = safeNumber(fees?.fastestFee, 0) > 0;
+    const hasMid = safeNumber(fees?.halfHourFee, 0) > 0;
+    const hasHour = safeNumber(fees?.hourFee, 0) > 0;
+
+    $("fHigh").textContent = hasFast ? `${fees.fastestFee} sat/vB` : "No disponible";
+    $("fMid").textContent = hasMid ? `${fees.halfHourFee} sat/vB` : "No disponible";
+    $("fLow").textContent = hasHour ? `${fees.hourFee} sat/vB` : "No disponible";
+
+    return { hasFast, hasMid, hasHour };
+  }
+
+  function renderDecision(rate, fees) {
+    const fastest = safeNumber(fees?.fastestFee, 0);
+    const halfHour = safeNumber(fees?.halfHourFee, 0);
+    const hasFeeData = fastest > 0 && halfHour > 0;
+
+    if (!hasFeeData) {
+      if (currentRbfDirect || currentRbfHistory) {
+        setDecision("warn", "🟡 INFORMACIÓN RBF SEÑALIZADO — TARIFAS NO DISPONIBLES",
+          "Hay señal directa o historial RBF asociado, pero no se han podido obtener las referencias actuales de mempool.space. No uses una tarifa calculada a ciegas; consulta de nuevo antes de reemplazarla.");
+      } else {
+        setDecision("bad", "⚠️ DATOS INSUFICIENTES",
+          "No se han podido obtener las referencias de tarifas actuales. Comprueba la conexión con mempool.space antes de decidir entre esperar, RBF o CPFP.");
+      }
+      return;
+    }
+
+    if (currentRbfDirect || currentRbfHistory) {
+      if (rate < halfHour) {
+        setDecision("warn", "🟡 RBF PUEDE SER LA MEJOR OPCIÓN",
+          "La transacción tiene señal de reemplazabilidad y su tasa de comisión está por debajo de la referencia aproximada de 30 minutos. La nueva transacción debe cumplir con las reglas de RBF y la política de aceptación de los nodos de la red.");
+      } else {
+        setDecision("good", "🟢 RBF SEÑALIZADO",
+          "La transacción parece reemplazable y su tasa de comisión ya está cerca de las referencias actuales. Si no tienes prisa, esperar puede ser razonable.");
+      }
+    } else {
+      setDecision("warn", "🟡 RBF DIRECTO NO DETECTADO — VALORA CPFP",
+        "No se detecta señal directa de RBF. CPFP puede seguir siendo posible si controlas una salida no gastada de esta transacción; la ausencia de datos del endpoint CPFP no significa que CPFP sea imposible.");
+    }
+  }
+
+  window.analizarTransaccion = async function () {
+    const txid = $("txid").value.trim().toLowerCase();
+    const errorBox = $("errorBox");
+    errorBox.classList.add("hidden");
+
+    if (!validateTxid(txid)) {
+      errorBox.textContent = "TXID no válido. Debe contener exactamente 64 caracteres hexadecimales.";
+      errorBox.classList.remove("hidden");
+      return;
+    }
+
+    const btn = $("analizarBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Analizando…';
+
+    try {
+      const [tx, status, feesResult, cpfpResult, outspendsResult, rbfResult] = await Promise.allSettled([
+        getJSON(`${API}/tx/${txid}`),
+        getJSON(`${API}/tx/${txid}/status`),
+        getJSON(`${API}/v1/fees/recommended`),
+        getJSON(`${API}/v1/cpfp/${txid}`),
+        getOutspends(txid),
+        getRbfTimeline(txid)
+      ]);
+
+      if (tx.status === "rejected") {
+        throw new Error("No se pudo obtener la transacción: " + tx.reason.message);
+      }
+      if (status.status === "rejected") {
+        throw new Error("No se pudo obtener el estado de la transacción: " + status.reason.message);
+      }
+
+      const txData = tx.value;
+      const statusData = status.value;
+      const fees = feesResult.status === "fulfilled" ? feesResult.value : null;
+      const cpfp = cpfpResult.status === "fulfilled" ? cpfpResult.value : null;
+      const outspends = outspendsResult.status === "fulfilled" ? outspendsResult.value : null;
+      const rbfTimeline = rbfResult.status === "fulfilled" ? rbfResult.value : null;
+
+      currentTxData = txData;
+      currentFees = fees;
+      currentCpfp = cpfp;
+      currentRate = calcFeeRate(txData);
+      currentVsize = getTxVsize(txData);
+      currentRbfDirect = directRbf(txData);
+      currentRbfHistory = hasRbfHistory(rbfTimeline);
+
+      $("resultado").classList.remove("hidden");
+
+      const confirmed = !!statusData.confirmed;
+      const confirmedMsg = $("confirmedMessage");
+      const analisis = $("analisisNoConfirmado");
+
+      if (confirmed) {
+        confirmedMsg.classList.remove("hidden");
+        analisis.classList.add("hidden");
+        $("mempoolLink").href = `https://mempool.space/tx/${txid}`;
+        return;
+      }
+
+      confirmedMsg.classList.add("hidden");
+      analisis.classList.remove("hidden");
+
+      $("mEstado").textContent = formatStatus(statusData);
+      $("mFee").textContent = sat(txData.fee);
+      $("mVsize").textContent = currentVsize > 0 ? currentVsize.toLocaleString("es-ES") + " vB" : "No disponible";
+      $("mRate").textContent = currentRate > 0 ? currentRate.toFixed(2) + " sat/vB" : "No disponible";
+
+      if (currentRbfDirect) {
+        $("mRbf").textContent = currentRbfHistory ? "🟢 SÍ — directo (con historial RBF)" : "🟢 SÍ — directo";
+      } else if (currentRbfHistory) {
+        $("mRbf").textContent = "🟡 historial RBF detectado";
+      } else {
+        $("mRbf").textContent = "🔴 NO detectado";
+      }
+
+      $("mConf").textContent = "0";
+
+      const feeFlags = setFeeDisplays(fees);
+      const fastest = safeNumber(fees?.fastestFee, 0);
+      const halfHour = safeNumber(fees?.halfHourFee, 0);
+      const hour = safeNumber(fees?.hourFee, 0);
+
+      let ratio = 0;
+      if (fastest > 0 && currentRate > 0) {
+        ratio = Math.min(100, (currentRate / fastest) * 100);
+      }
+      $("rateBar").style.width = ratio + "%";
+
+      let comment = "";
+      let interpretation = "";
+
+      if (!feeFlags.hasFast || !feeFlags.hasMid || !feeFlags.hasHour) {
+        comment = "⚪ No se han podido obtener todas las referencias actuales de la comisión.";
+        interpretation = "Comprueba de nuevo las tarifas antes de tomar una decisión económica.";
+      } else if (currentRate >= fastest) {
+        comment = "✅ Tu tasa de comisión está al nivel o por encima de la referencia actual para el próximo bloque.";
+        interpretation = "Es una buena posición relativa, pero la confirmación no puede garantizarse en un bloque concreto.";
+      } else if (currentRate >= halfHour) {
+        comment = "⏳ Tu tasa de comisión está entre las referencias de próximo bloque y media hora.";
+        interpretation = "La posición puede ser razonable, pero depende de la evolución del mempool y de la política del nodo/minero.";
+      } else if (currentRate >= hour) {
+        comment = "🐢 Tu tasa de comisión está por debajo de la referencia media de 30 minutos.";
+        interpretation = "Puede tardar más; RBF o CPFP pueden ser opciones si necesitas acelerar y se cumplen sus condiciones.";
+      } else {
+        comment = "⚠️ Tu tasa de comisión está por debajo de las referencias actuales.";
+        interpretation = "La espera puede ser larga. Estudia RBF o CPFP antes de crear una transacción nueva.";
+      }
+
+      $("rateComment").textContent = comment;
+      $("rateInterpretation").textContent = interpretation;
+
+      const targets = chooseTargets(currentRate, fees);
+      $("targetMin").textContent = targets.minimum.toFixed(0) + " sat/vB (orientativo)";
+      $("targetRec").textContent = targets.recommended > 0
+        ? targets.recommended.toFixed(0) + " sat/vB"
+        : "No disponible";
+
+      if (currentVsize > 0 && targets.recommended > 0) {
+        const additional = Math.max(0, Math.ceil((targets.recommended - currentRate) * currentVsize));
+        $("extraFee").textContent = sat(additional);
+      } else {
+        $("extraFee").textContent = "No disponible";
+      }
+
+      renderDecision(currentRate, fees);
+
+      if (hasCpfpData(cpfp)) {
+        const ancestors = getAncestorCount(cpfp);
+        const descendants = getDescendantCount(cpfp);
+        const effective = safeNumber(cpfp.effectiveFeePerVsize, 0);
+        const bestDescRate = getBestDescendantRate(cpfp);
+        const lines = [
+          `🔹 Ancestros: ${ancestors}`,
+          `🔹 Descendientes: ${descendants}`
+        ];
+
+        if (effective > 0) lines.push(`🔹 Tasa de comisión efectiva informada por mempool.space: ${effective.toFixed(2)} sat/vB`);
+        if (bestDescRate > 0) lines.push(`🔹 Mejor descendiente informado: ${bestDescRate.toFixed(2)} sat/vB`);
+
+        lines.push(
+          "",
+          "💡 Los ancestros no confirmados sí son relevantes para calcular el package feerate de una nueva hija.",
+          "💡 Los descendientes existentes no se suman automáticamente al paquete de una nueva hija.",
+          "💡 CPFP solo se puede usar si controlas una salida no gastada de la transacción y puedes crear una hija válida."
+        );
+        $("cpfpBox").textContent = lines.join("\n");
+      } else {
+        $("cpfpBox").textContent =
+          "No se pudo obtener información de paquetes CPFP para esta transacción.\n\n" +
+          "Esto no significa que CPFP sea imposible: revisa las salidas no gastadas y comprueba si controlas alguna de ellas.";
+      }
+
+      renderOutputs(txData, outspends);
+      updateEstimatedSize();
+      await calcularCPFP();
+      $("resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+
+    } catch (e) {
+      console.error(e);
+      errorBox.textContent = "No se pudo analizar la transacción: " + e.message + ". Comprueba el TXID y vuelve a intentarlo.";
+      errorBox.classList.remove("hidden");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "🔎 Analizar";
+    }
+  };
+
+  function autoUpdate() {
+    if (currentTxData && currentFees) {
+      updateEstimatedSize();
+      calcularCPFP();
+    }
+  }
+
+  $("txType").addEventListener("change", autoUpdate);
+  $("inputsCount").addEventListener("input", autoUpdate);
+  $("outputsCount").addEventListener("input", autoUpdate);
+  $("cpfpOutput").addEventListener("change", autoUpdate);
+
+  $("calcularCpfpBtn").addEventListener("click", async function () {
+    await calcularCPFP();
+  });
+
+  $("txid").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") window.analizarTransaccion();
+  });
+
+  updateEstimatedSize();
+})();
+</script>
+
+<footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
+    <p>
+        © 2026 <strong>clavebit.com</strong> | 
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
+        | Cero analíticas, cero rastreo, privacidad absoluta
+    </p>
+    
+    <p>
+        Web educativa creada por un matemático anónimo entusiasta de Bitcoin. Cualquier duda o consulta <b>info@clavebit.com</b>
+    </p> 
+    
+    <p>
+        Para apoyar el proyecto puede hacer una donación
+    </p>
+    <p>
+        Dirección Bitcoin:
+    </p>  
+    
+    <p>
+        <b>bc1q8tzdrqrpl9p33xc5cvk2an68cct7ep58eqklx7</b>
+    </p>
+    
+    <p>
+        Gracias por adelantado y un saludo
+    </p>
+</footer>
+
+</body>
+</html>
