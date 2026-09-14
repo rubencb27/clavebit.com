@@ -1,0 +1,414 @@
+<!--
+  Copyright (c) 2026 clavebit.com
+  Licensed under the MIT License.
+  Open Source: https://github.com
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Consolidación de UTXOs en Bitcoin</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline' https://mempool.space; connect-src https://mempool.space; object-src 'none'; img-src 'self' data:;">
+    <meta name="description" content="Calculadora y estimador de ahorro en comisiones para consolidar UTXOs de Bitcoin analizando el mempool en tiempo real.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+
+<style>
+        .crypto-generator-container {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            box-sizing: border-box;
+            color: #1e293b;
+        }
+
+        .header-proyecto {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+
+        .main-titulo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+        }
+
+        .main-descripcion {
+            font-size: 1rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .grid-botones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .grid-botones button {
+            border: none;
+            padding: 12px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 50px;
+        }
+
+        .grid-botones button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            filter: brightness(1.05);
+        }
+
+        .grid-botones button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .paso-seccion {
+            margin-bottom: 24px;
+            padding: 16px 16px 16px 20px;
+            border-radius: 0 12px 12px 0;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .paso-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .paso-titulo {
+            margin: 0 0 8px 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .paso-descripcion {
+            margin: 0 0 12px 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #475569;
+        }
+
+        .paso-subetiqueta {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin: 8px 0 4px 0;
+            font-weight: 600;
+        }
+
+        .terminal-box {
+            background: #0f172a;
+            padding: 14px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            word-break: break-all;
+            white-space: pre-wrap;
+            min-height: 24px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            color: #e2e8f0;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            font-size: 0.9rem;
+            color: #0f172a;
+            box-sizing: border-box;
+            margin-top: 4px;
+        }
+
+        .seccion-resumen {
+            background: #fffbeb;
+            border: 2px dashed #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .p1 { border-left: 4px solid #f7931a; } .p1 .paso-tag { color: #f7931a; }
+        .p2 { border-left: 4px solid #2563eb; } .p2 .paso-tag { color: #2563eb; }
+        .p3 { border-left: 4px solid #10b981; } .p3 .paso-tag { color: #10b981; }
+        .p4 { border-left: 4px solid #7c3aed; } .p4 .paso-tag { color: #7c3aed; }
+
+        #resumen-ahorro { color: #4ade80; background: #0f172a; font-size: 1.3rem; font-weight: bold; }
+        #resumen-momento { color: #fbbf24; background: #0f172a; font-size: 1.1rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="crypto-generator-container">
+
+    <div class="header-proyecto">
+        <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com" rel="noopener" style="text-decoration: none; color: orange;">Clave privada, pública y dirección</a></p> 
+		
+		
+		
+	 
+		
+		<p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/billeterahd.html" rel="noopener" style="text-decoration: none; color: orange;">Billetera HD (BIP39/BIP84)</a></p>
+        <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/rbf.html" rel="noopener" style="text-decoration: none;color: orange;">Rescatar transacción</a></p>
+
+		
+		<h1 class="main-titulo">Consolidación de UTXOs en Bitcoin</h1>
+        <p class="main-descripcion">Calcula el peso virtual de tu transacción según el tipo de dirección y compara el coste con las tarifas actuales de la red.</p>
+    </div>
+
+    <!-- Grid de Botones Pasos -->
+    <div class="grid-botones">
+        <button onclick="pasoConfigurar()" style="background: #f7931a; color: white;">
+            1. Configurar
+        </button>
+        <button id="btn-mempool" onclick="pasoConsultarMempool()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            2. Tarifa Mempool
+        </button>
+        <button id="btn-vbytes" onclick="pasoCalcularvBytes()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            3. Calcular Peso
+        </button>
+        <button id="btn-ahorro" onclick="pasoCalcularAhorro()" disabled style="background: #e2e8f0; color: #a0aec0;">
+            4. Ver Ahorro
+        </button>
+    </div>
+
+    <!-- PASO 1 -->
+    <div class="paso-seccion p1">
+        <span class="paso-tag">PASO 1: ENTRADA DE DATOS</span>
+        <h4 class="paso-titulo">Parámetros de las salidas no gastadas (UTXOs)</h4>
+        <p class="paso-descripcion">Indica cuántas entradas pequeñas quieres consolidar en una sola dirección y el tipo de formato que utiliza tu billetera.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 10px;">
+            <div>
+                <label class="paso-subetiqueta" style="color:#0f172a;">Número de UTXOs:</label>
+                <input type="number" id="input-utxos" class="input-control" value="15" min="2" max="200">
+            </div>
+            <div>
+                <label class="paso-subetiqueta" style="color:#0f172a;">Tipo de dirección:</label>
+                <select id="select-address" class="input-control">
+                    <option value="segwit_native">Native SegWit (bc1q)</option>
+                    <option value="taproot">Taproot (bc1p)</option>
+                    <option value="segwit_p2sh">Nested SegWit (3)</option>
+                    <option value="legacy">Legacy (1)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="paso-seccion p2">
+        <span class="paso-tag">PASO 2: CONEXIÓN EN TIEMPO REAL</span>
+        <h4 class="paso-titulo">Obtener tarifas de mempool y precio de Bitcoin</h4>
+        <p class="paso-descripcion">Se consulta la API pública de Mempool.space para obtener las tarifas estimadas de la red y el precio de Bitcoin en USD.</p>
+        
+        <div class="paso-subetiqueta" style="color: #60a5fa;">Respuesta API Mempool:</div>
+        <div id="terminal-mempool" class="terminal-box">Tarifa Mempool...</div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="paso-seccion p3">
+        <span class="paso-tag">PASO 3: CÁLCULO DE PESO VIRTUAL</span>
+        <h4 class="paso-titulo">Aproximación de tamaño de transacción (vBytes)</h4>
+        <p class="paso-descripcion">Calculamos el peso total multiplicando el número de entradas por el coste de firma según el script y sumando la salida hacia tu wallet.</p>
+        
+        <div class="paso-subetiqueta" style="color: #34d399;">Detalle de tamaño calculado:</div>
+        <div id="terminal-vbytes" class="terminal-box">Peso...</div>
+    </div>
+
+    <!-- PASO 4 -->
+    <div class="paso-seccion p4">
+        <span class="paso-tag">PASO 4: COMPARACIÓN</span>
+        <h4 class="paso-titulo">Comparación de costes</h4>
+<p class="paso-descripcion">Evaluamos lo que pagarías en este instante frente al escenario de tarifa reducida en valles de baja congestión en la proyección actual.</p>        
+        <div class="paso-subetiqueta" style="color: #c084fc;">Desglose financiero:</div>
+        <div id="terminal-ahorro" class="terminal-box">Costes...</div>
+    </div>
+
+    <!-- SECCIÓN RESUMEN -->
+    <div class="seccion-resumen">
+        <h3 style="margin: 0 0 15px 0; color: #92400e; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">
+            📊 Resumen de optimización
+        </h3>
+        
+        <div class="paso-subetiqueta" style="color: #b45309; font-weight: bold;">Tu ahorro estimado:</div>
+        <div id="resumen-ahorro" class="terminal-box">Ahorro...</div>
+        
+        <div class="paso-subetiqueta" style="color: #b45309; font-weight: bold; margin-top: 15px;">Comparación de tarifas:</div>
+        <div id="resumen-momento" class="terminal-box">Comparación...</div>
+    </div>
+<b>Nota</b>: La mayoría de los nodos tienen configurada la tarifa mínima de comisión a 1 sat/vB y si intentas enviar o consolidar una transacción menor de 1 sat/vB la gran mayoría de los nodos la descartarían inmediatamente 
+y no llegaría a difundirse en la mempool.
+</div>
+
+<script>
+// Variables Globales
+let numUtxos = 15;
+let addressType = "segwit_native";
+let estimatedVBytes = 0;
+let feeHalfHour = 0;
+let feeMin = 0.1;
+let btcPriceUSD = 0;
+
+let costCurrentSats = 0;
+let costOptimalSats = 0;
+let savingsSats = 0;
+let savingsUSD = 0;
+
+function estimateVBytes(inputsCount, addressFormat) {
+    const sizes = {
+        "legacy": { input: 148, output: 34, overhead: 10 },
+        "segwit_p2sh": { input: 91, output: 32, overhead: 11 },
+        "segwit_native": { input: 68, output: 31, overhead: 11 },
+        "taproot": { input: 58, output: 43, overhead: 11 }
+    };
+    const spec = sizes[addressFormat] || sizes["segwit_native"];
+    return Math.round((inputsCount * spec.input) + (1 * spec.output) + spec.overhead);
+}
+
+function pasoConfigurar() {
+    numUtxos = parseInt(document.getElementById('input-utxos').value) || 10;
+    addressType = document.getElementById('select-address').value;
+
+    document.getElementById('terminal-mempool').innerText = "Tarifa Mempool...";
+    document.getElementById('terminal-vbytes').innerText = "Peso...";
+    document.getElementById('terminal-ahorro').innerText = "Costes...";
+    document.getElementById('resumen-ahorro').innerText = "Ahorro...";
+    document.getElementById('resumen-momento').innerText = "Comparación...";
+
+    const btnMempool = document.getElementById('btn-mempool');
+    btnMempool.disabled = false;
+    btnMempool.style.background = "#2563eb";
+    btnMempool.style.color = "white";
+
+    ['btn-vbytes', 'btn-ahorro'].forEach(id => {
+        const btn = document.getElementById(id);
+        btn.disabled = true;
+        btn.style.background = "#e2e8f0";
+        btn.style.color = "#a0aec0";
+    });
+}
+
+async function pasoConsultarMempool() {
+    document.getElementById('terminal-mempool').innerText = "Conectando con mempool.space...";
+    try {
+        const [resFees, resPrice, resBlocks] = await Promise.all([
+            fetch('https://mempool.space/api/v1/fees/recommended'),
+            fetch('https://mempool.space/api/v1/prices'),
+            fetch('https://mempool.space/api/v1/fees/mempool-blocks')
+        ]);
+
+        const feesData = await resFees.json();
+        const priceData = await resPrice.json();
+        const blocksData = await resBlocks.json();
+
+        feeHalfHour = feesData.halfHourFee;
+        btcPriceUSD = priceData.USD || 60000;
+
+        // Extraer el límite inferior decimal exacto desde los bloques en proyección
+        if (blocksData && blocksData.length > 0 && blocksData[0].feeRange) {
+            feeMin = parseFloat(blocksData[0].feeRange[0]).toFixed(2);
+        } else {
+            feeMin = "0.10";
+        }
+
+        document.getElementById('terminal-mempool').innerHTML = 
+            `🟢 <span style="color:#34d399;">Conexión correcta</span>\n` +
+            `• Tarifa estimada (~30 min): ` +  `<span style="color:#fbbf24; font-weight:bold;">${feeHalfHour} sat/vB</span>\n` +
+            `• Tarifa más baja observada en la proyección: ` + `<span style="color:#38bdf8; font-weight:bold;">${feeMin} sat/vB</span>\n` +
+            `• Precio Bitcoin: ` + `<span style="color:#f43f5e;">$${btcPriceUSD.toLocaleString()} USD</span>`;
+
+        const btnVBytes = document.getElementById('btn-vbytes');
+        btnVBytes.disabled = false;
+        btnVBytes.style.background = "#10b981";
+        btnVBytes.style.color = "white";
+
+    } catch (e) {
+        document.getElementById('terminal-mempool').innerText = "Error al conectar con la API de mempool.space.";
+    }
+}
+
+function pasoCalcularvBytes() {
+    estimatedVBytes = estimateVBytes(numUtxos, addressType);
+
+    document.getElementById('terminal-vbytes').innerHTML = 
+        `📐 <span style="color:#a7f3d0; font-weight:bold;">Resultado del análisis de estructura</span>\n` +
+        `• Entradas a juntar: ${numUtxos} UTXOs\n` +
+        `• Formato seleccionado: ${addressType}\n` +
+        `• Peso estimado total: <span style="color:#fbbf24; font-size:1rem; font-weight:bold;">${estimatedVBytes.toLocaleString()} vBytes</span>`;
+
+    const btnAhorro = document.getElementById('btn-ahorro');
+    btnAhorro.disabled = false;
+    btnAhorro.style.background = "#7c3aed";
+    btnAhorro.style.color = "white";
+}
+
+function pasoCalcularAhorro() {
+    const optimalRate = parseFloat(feeMin);
+
+    costCurrentSats = Math.round(estimatedVBytes * parseFloat(feeHalfHour));
+    costOptimalSats = Math.round(estimatedVBytes * optimalRate);
+
+    const currentUSD = (costCurrentSats / 100000000) * btcPriceUSD;
+    const optimalUSD = (costOptimalSats / 100000000) * btcPriceUSD;
+
+    savingsSats = Math.max(0, costCurrentSats - costOptimalSats);
+    savingsUSD = Math.max(0, currentUSD - optimalUSD);
+    
+    const savingsPercent = costCurrentSats > 0 
+        ? Math.round((savingsSats / costCurrentSats) * 100) 
+        : 0;
+
+    document.getElementById('terminal-ahorro').innerHTML = 
+        `🔴 <span style="color:#f43f5e; font-weight:bold;">COSTE AHORA (${feeHalfHour} sat/vB):</span> ${costCurrentSats.toLocaleString()} sats (~$${currentUSD.toFixed(2)} USD)\n` +
+        `🟢 <span style="color:#34d399; font-weight:bold;">COSTE A TARIFA BAJA OBSERVADA (${optimalRate} sat/vB):</span> ${costOptimalSats.toLocaleString()} sats (~$${optimalUSD.toFixed(2)} USD)`;
+
+    document.getElementById('resumen-ahorro').innerHTML = 
+        `<span style="color:#4ade80;">${savingsSats.toLocaleString()} sats</span> (~$${savingsUSD.toFixed(2)} USD)`;
+
+    document.getElementById('resumen-momento').innerText = 
+       `[${savingsPercent}% de ahorro]`
+    document.querySelector('.seccion-resumen').scrollIntoView({ behavior: 'smooth' });
+}
+
+</script>
+
+
+<footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
+    <p>
+        © 2026 <strong>clavebit.com</strong> | 
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
+        | Cero analíticas, cero rastreo, privacidad absoluta
+    </p>
+    <p>Web educativa creada por un matemático anónimo entusiasta de Bitcoin. Cualquier duda o consulta <b>info@clavebit.com</b></p> 
+    <p>Para apoyar el proyecto puede hacer una donación</p>
+    <p>Dirección Bitcoin:</p>    
+    <p><b>bc1q8tzdrqrpl9p33xc5cvk2an68cct7ep58eqklx7</b></p>
+    <p>Gracias por adelantado y un saludo</p>
+</footer>
+
+</body>
+</html>
