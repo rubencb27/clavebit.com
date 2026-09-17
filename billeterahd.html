@@ -9,444 +9,452 @@
 <head>
     <title>Generador de Billetera HD BIP39 / BIP84</title>
     <meta charset="UTF-8">
+    <!-- UN UNICO CSP CONSOLIDADO Y CORREGIDO -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; object-src 'none'; img-src 'self' data:;">
     <meta name="description" content="Generador de frase semilla BIP39 y derivación HD BIP84 a partir de entropía">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
 
 <style>
-    .crypto-generator-container {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        max-width: 1000px;
-        margin: 20px auto;
-        background: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        padding: 24px;
-        box-sizing: border-box;
-        color: #1e293b;
-    }
+        .crypto-generator-container {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            box-sizing: border-box;
+            color: #1e293b;
+        }
 
-    .header-proyecto {
-        margin-bottom: 25px;
-        border-bottom: 1px solid #e2e8f0;
-        padding-bottom: 20px;
-    }
+        /* Estilos para el Título y Descripción Solicitados */
+        .header-proyecto {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
 
-    .main-titulo {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 0 0 8px 0;
-    }
+        .main-titulo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+        }
 
-    .main-descripcion {
-        font-size: 1rem;
-        color: #64748b;
-        margin: 0;
-        line-height: 1.5;
-    }
+        .main-descripcion {
+            font-size: 1rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
 
-    .grid-botones {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 10px;
-        margin-bottom: 10px;
-    }
+        /* Contenedor de Botones en Rejilla Responsiva */
+        .grid-botones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
 
-    .grid-botones button {
-        border: none;
-        padding: 12px 10px;
-        cursor: pointer;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        min-height: 50px;
-    }
+        .grid-botones button {
+            border: none;
+            padding: 12px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 50px;
+        }
 
-    .grid-botones button:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        filter: brightness(1.05);
-    }
+        .grid-botones button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            filter: brightness(1.05);
+        }
 
-    .grid-botones button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
+        .grid-botones button:active:not(:disabled) {
+            transform: translateY(0);
+        }
 
-    .header-derivar {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
-        background: #f8fafc;
-        padding: 12px 16px;
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
-        margin-top: 0;
-    }
+        .grid-botones button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-    .header-derivar label {
-        font-weight: 600;
-        color: #0f172a;
-        font-size: 0.9rem;
-        white-space: nowrap;
-    }
+        .header-derivar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
 
-    .header-derivar input {
-        flex: 1;
-        min-width: 160px;
-        padding: 10px 14px;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        font-family: inherit;
-        transition: border-color 0.2s;
-        background: white;
-    }
+        .header-derivar label {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
 
-    .header-derivar input:focus {
-        outline: none;
-        border-color: #a855f7;
-    }
+        .header-derivar input {
+            flex: 1;
+            min-width: 160px;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: white;
+        }
 
-    .header-derivar .btn-derivar,
-    .header-derivar .btn-derivar-clave,
-    .header-derivar .btn-derivar-direcciones {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        white-space: nowrap;
-    }
+        .header-derivar input:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
 
-    .header-derivar .btn-derivar { background: #a855f7; color: white; }
-    .header-derivar .btn-derivar:hover { background: #9333ea; transform: scale(1.02); }
+        .header-derivar .btn-derivar,
+        .header-derivar .btn-derivar-clave,
+        .header-derivar .btn-derivar-direcciones {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
 
-    .header-derivar .btn-derivar-clave { background: #10b981; color: white; }
-    .header-derivar .btn-derivar-clave:hover { background: #059669; transform: scale(1.02); }
+        .header-derivar .btn-derivar { background: #a855f7; color: white; }
+        .header-derivar .btn-derivar:hover { background: #9333ea; transform: scale(1.02); }
 
-    .header-derivar .btn-derivar-direcciones { background: #38bdf8; color: #0f172a; }
-    .header-derivar .btn-derivar-direcciones:hover { background: #0284c7; color: white; transform: scale(1.02); }
+        .header-derivar .btn-derivar-clave { background: #10b981; color: white; }
+        .header-derivar .btn-derivar-clave:hover { background: #059669; transform: scale(1.02); }
 
-    .header-derivar button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .header-derivar .btn-derivar-direcciones { background: #38bdf8; color: #0f172a; }
+        .header-derivar .btn-derivar-direcciones:hover { background: #0284c7; color: white; transform: scale(1.02); }
 
-    .paso-seccion {
-        margin-bottom: 24px;
-        padding: 16px 16px 16px 20px;
-        border-radius: 0 12px 12px 0;
-        background: #f8fafc;
-        transition: all 0.3s ease;
-        border-left: 4px solid #94a3b8;
-    }
+        .header-derivar button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    .paso-tag {
-        font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.05em;
-        display: inline-block;
-        margin-bottom: 4px;
-        color: #475569;
-    }
+        /* Estructura de los Pasos */
+        .paso-seccion {
+            margin-bottom: 24px;
+            padding: 16px 16px 16px 20px;
+            border-radius: 0 12px 12px 0;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
 
-    .paso-titulo {
-        margin: 0 0 8px 0;
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #0f172a;
-    }
+        .paso-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
 
-    .paso-descripcion {
-        margin: 0 0 12px 0;
-        font-size: 0.85rem;
-        line-height: 1.5;
-        color: #475569;
-    }
+        .paso-titulo {
+            margin: 0 0 8px 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
 
-    .terminal-box {
-        background: #0f172a;
-        padding: 14px;
-        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-        font-size: 0.85rem;
-        line-height: 1.6;
-        word-break: break-all;
-        white-space: pre-wrap;
-        min-height: 24px;
-        border-radius: 8px;
-        border: 1px solid #1e293b;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        color: #e2e8f0;
-    }
+        .paso-descripcion {
+            margin: 0 0 12px 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #475569;
+        }
 
-    .palabra-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 8px;
-        margin-top: 12px;
-    }
+        /* Bloques de Código/Consola Terminal */
+        .terminal-box {
+            background: #0f172a;
+            padding: 14px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            word-break: break-all;
+            white-space: pre-wrap;
+            min-height: 24px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            color: #e2e8f0;
+        }
 
-    .palabra-item {
-        background: #1e293b;
-        padding: 8px 6px;
-        border-radius: 4px;
-        text-align: center;
-        font-size: 0.8rem;
-        border: 1px solid #334155;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-    }
+        .palabra-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
 
-    .palabra-item .idx { color: #64748b; font-size: 0.65rem; }
-    .palabra-item .word { color: #38bdf8; font-weight: bold; font-size: 1rem; }
-    .palabra-item .bip-index {
-        color: #fbbf24;
-        font-size: 0.7rem;
-        font-weight: bold;
-        background: #2d3748;
-        border-radius: 12px;
-        padding: 1px 10px;
-        display: inline-block;
-        margin-top: 2px;
-        border: 1px solid #fbbf2444;
-    }
+        .palabra-item {
+            background: #1e293b;
+            padding: 8px 6px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.8rem;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
 
-    .p1 { border-left-color: #f7931a; } .p1 .paso-tag { color: #f7931a; }
-    .p2 { border-left-color: #2563eb; } .p2 .paso-tag { color: #2563eb; }
-    .p3 { border-left-color: #10b981; } .p3 .paso-tag { color: #10b981; }
-    .p4 { border-left-color: #a855f7; } .p4 .paso-tag { color: #a855f7; }
-    .p5 { border-left-color: #10b981; } .p5 .paso-tag { color: #10b981; }
+        .palabra-item .idx { color: #64748b; font-size: 0.65rem; }
+        .palabra-item .word { color: #38bdf8; font-weight: bold; font-size: 1rem; }
+        .palabra-item .bip-index {
+            color: #fbbf24;
+            font-size: 0.7rem;
+            font-weight: bold;
+            background: #2d3748;
+            border-radius: 12px;
+            padding: 1px 10px;
+            display: inline-block;
+            margin-top: 2px;
+            border: 1px solid #fbbf2444;
+        }
 
-    .hex-entropy { color: #fbbf24; font-weight: bold; word-break: break-all; }
-    .bits-label { color: #94a3b8; font-size: 0.75rem; }
+        /* Colores Temáticos por Paso */
+        .p1 { border-left: 4px solid #f7931a; } .p1 .paso-tag { color: #f7931a; }
+        .p2 { border-left: 4px solid #2563eb; } .p2 .paso-tag { color: #2563eb; }
+        .p3 { border-left: 4px solid #10b981; } .p3 .paso-tag { color: #10b981; }
+        .p4 { border-left: 4px solid #a855f7; } .p4 .paso-tag { color: #a855f7; }
+        .p5 { border-left: 4px solid #10b981; } .p5 .paso-tag { color: #10b981; }
 
-    .frase-final-container {
-        margin-top: 20px;
-        padding: 20px;
-        background: #f1f5f9;
-        border-radius: 12px;
-        border: 2px solid #e2e8f0;
-        display: none;
-    }
+        .hex-entropy { color: #fbbf24; font-weight: bold; word-break: break-all; }
+        .bits-label { color: #94a3b8; font-size: 0.75rem; }
 
-    .frase-final-container h3 { margin: 0 0 15px 0; color: #0f172a; font-size: 1.2rem; text-align: center; }
+        .frase-final-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            display: none;
+        }
 
-    .frase-completa {
-        padding: 20px 24px;
-        background: #0f172a;
-        border-radius: 8px;
-        color: #38bdf8;
-        font-family: 'SFMono-Regular', Consolas, monospace;
-        font-size: 1.15rem;
-        font-weight: bold;
-        border: 2px solid #f7931a;
-        text-align: center;
-        word-break: normal;
-        white-space: normal;
-        overflow-wrap: break-word;
-        line-height: 1.8;
-        letter-spacing: 0.5px;
-    }
+        .frase-final-container h3 { margin: 0 0 15px 0; color: #0f172a; font-size: 1.2rem; text-align: center; }
 
-    .btn-copiar {
-        margin-top: 14px;
-        padding: 10px 28px;
-        background: #f7931a;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
+        .frase-completa {
+            padding: 20px 24px;
+            background: #0f172a;
+            border-radius: 8px;
+            color: #38bdf8;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 1.15rem;
+            font-weight: bold;
+            border: 2px solid #f7931a;
+            text-align: center;
+            word-break: normal;
+            white-space: normal;
+            overflow-wrap: break-word;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+        }
 
-    .btn-copiar:hover { background: #e6850f; transform: scale(1.02); }
+        .btn-copiar {
+            margin-top: 14px;
+            padding: 10px 28px;
+            background: #f7931a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    .seed-section-inline {
-        margin-top: 16px;
-        padding: 20px;
-        background: #f1f5f9;
-        border-radius: 10px;
-        border: 2px solid #a855f7;
-        display: none;
-    }
+        .btn-copiar:hover { background: #e6850f; transform: scale(1.02); }
 
-    .seed-result {
-        background: #0f172a;
-        padding: 20px;
-        border-radius: 8px;
-        font-family: 'SFMono-Regular', Consolas, monospace;
-        font-size: 1.1rem;
-        word-break: break-all;
-        color: #e2e8f0;
-        border: 1px solid #1e293b;
-    }
+        .seed-section-inline {
+            margin-top: 16px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            border: 2px solid #a855f7;
+            display: none;
+        }
 
-    .seed-result .seed-label { color: #94a3b8; font-weight: normal; font-size: 1rem; }
-    .seed-result .seed-hex { color: #a855f7; font-weight: bold; font-size: 1.1rem; line-height: 1.8; letter-spacing: 0.5px; }
-    .seed-result .seed-info-text { color: #64748b; font-size: 0.75rem; margin-top: 8px; }
+        .seed-result {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            color: #e2e8f0;
+            border: 1px solid #1e293b;
+        }
 
-    .btn-copiar-seed {
-        margin-top: 12px;
-        padding: 10px 28px;
-        background: #a855f7;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
+        .seed-result .seed-label { color: #94a3b8; font-weight: normal; font-size: 1rem; }
+        .seed-result .seed-hex { color: #a855f7; font-weight: bold; font-size: 1.1rem; line-height: 1.8; letter-spacing: 0.5px; }
+        .seed-result .seed-info-text { color: #64748b; font-size: 0.75rem; margin-top: 8px; }
 
-    .btn-copiar-seed:hover { background: #9333ea; transform: scale(1.02); }
+        .btn-copiar-seed {
+            margin-top: 12px;
+            padding: 10px 28px;
+            background: #a855f7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    .seed-loading-small, .loading-small {
-        color: #a855f7;
-        font-weight: bold;
-        font-size: 0.85rem;
-        display: none;
-    }
+        .btn-copiar-seed:hover { background: #9333ea; transform: scale(1.02); }
 
-    .paso-botones {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 10px;
-    }
+        .seed-loading-small, .loading-small {
+            color: #a855f7;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: none;
+        }
 
-    .paso-botones button {
-        padding: 10px 24px;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
+        .paso-botones {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
 
-    .paso-botones button:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.05); }
-    .paso-botones button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .paso-botones button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
 
-    .paso-botones .btn-paso-seed { background: #a855f7; color: white; }
-    .paso-botones .btn-paso-clave { background: #10b981; color: white; }
+        .paso-botones button:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.05); }
+        .paso-botones button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    .pasos-independientes {
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 2px dashed #e2e8f0;
-    }
+        .paso-botones .btn-paso-seed { background: #a855f7; color: white; }
+        .paso-botones .btn-paso-clave { background: #10b981; color: white; }
 
-    .pasos-independientes .paso-seccion { background: #fafbfc; }
+        .pasos-independientes {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #e2e8f0;
+        }
 
-    .clave-maestra-section {
-        margin-top: 16px;
-        padding: 20px;
-        background: #f1f5f9;
-        border-radius: 10px;
-        border: 2px solid #10b981;
-        display: none;
-    }
+        .pasos-independientes .paso-seccion { background: #fafbfc; }
 
-    .clave-maestra-section h4 { margin: 0 0 12px 0; color: #0f172a; font-size: 1.2rem; text-align: center; }
+        .clave-maestra-section {
+            margin-top: 16px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            border: 2px solid #10b981;
+            display: none;
+        }
 
-    .clave-maestra-section .step-box {
-        background: white;
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin: 8px 0;
-        border: 1px solid #e2e8f0;
-    }
+        .clave-maestra-section h4 { margin: 0 0 12px 0; color: #0f172a; font-size: 1.2rem; text-align: center; }
 
-    .clave-maestra-section .step-box .step-title { font-weight: 700; color: #10b981; font-size: 0.85rem; }
+        .clave-maestra-section .step-box {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+        }
 
-    .clave-maestra-section .step-box .step-content {
-        font-family: 'SFMono-Regular', Consolas, monospace;
-        font-size: 0.75rem;
-        color: #1e293b;
-        word-break: break-all;
-        margin-top: 4px;
-        background: #f8fafc;
-        padding: 8px 10px;
-        border-radius: 4px;
-    }
+        .clave-maestra-section .step-box .step-title { font-weight: 700; color: #10b981; font-size: 0.85rem; }
 
-    .clave-formatos {
-        margin-top: 12px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
+        .clave-maestra-section .step-box .step-content {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.75rem;
+            color: #1e293b;
+            word-break: break-all;
+            margin-top: 4px;
+            background: #f8fafc;
+            padding: 8px 10px;
+            border-radius: 4px;
+        }
 
-    .clave-formatos .formato-box {
-        background: white;
-        padding: 12px 14px;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-    }
+        .clave-formatos {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
 
-    .clave-formatos .formato-box .formato-label { font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 4px; }
-    .clave-formatos .formato-box .formato-label.zprv-label { color: #a855f7; }
-    .clave-formatos .formato-box .formato-label.zpub-label { color: #10b981; }
+        .clave-formatos .formato-box {
+            background: white;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
 
-    .clave-formatos .formato-box .formato-valor {
-        font-family: 'SFMono-Regular', Consolas, monospace;
-        font-size: 0.7rem;
-        word-break: break-all;
-        background: #f8fafc;
-        padding: 6px 8px;
-        border-radius: 4px;
-        color: #1e293b;
-        line-height: 1.6;
-    }
+        .clave-formatos .formato-box .formato-label { font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 4px; }
+        .clave-formatos .formato-box .formato-label.zprv-label { color: #a855f7; }
+        .clave-formatos .formato-box .formato-label.zpub-label { color: #10b981; }
 
-    .btn-copiar-formatos {
-        margin-top: 8px;
-        padding: 6px 16px;
-        border: none;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: inline-block;
-    }
+        .clave-formatos .formato-box .formato-valor {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.7rem;
+            word-break: break-all;
+            background: #f8fafc;
+            padding: 6px 8px;
+            border-radius: 4px;
+            color: #1e293b;
+            line-height: 1.6;
+        }
 
-    .btn-copiar-formatos.copiar-zprv { background: #a855f7; color: white; }
-    .btn-copiar-formatos.copiar-zpub { background: #10b981; color: white; }
+        .btn-copiar-formatos {
+            margin-top: 8px;
+            padding: 6px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
 
-    .tabla-direcciones table td {
-        word-break: break-all;
-        font-family: 'SFMono-Regular', Consolas, monospace;
-    }
+        .btn-copiar-formatos.copiar-zprv { background: #a855f7; color: white; }
+        .btn-copiar-formatos.copiar-zpub { background: #10b981; color: white; }
+
+        .tabla-direcciones table td {
+            word-break: break-all;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
 </style>
 </head>
 <body>
 
 <div class="crypto-generator-container">
     <div class="header-proyecto">
-	      <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com" rel="noopener" style="text-decoration: none;color: orange;">Clave privada, pública y dirección</a></p>
-  
-
+        <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com" rel="noopener" style="text-decoration: none;color: orange;">Clave privada, pública y dirección</a></p>
+        <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/radar.html" rel="noopener" style="text-decoration: none;color: orange;">Consolidación de UTXOs</a></p>
+<p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/rbf.html" rel="noopener" style="text-decoration: none;color: orange;">Rescatar transacción</a></p>
 
         <h1 class="main-titulo">Generador de Billetera HD (BIP39/BIP84)</h1>
         <p class="main-descripcion">Genera una frase mnemotécnica de 24 palabras, su semilla (seed PBKDF2) con passphrase opcional, sus claves privada y pública extendidas, y direcciones SegWit nativas.</p>
@@ -644,6 +652,18 @@ let seedGenerada = null;
 let zprvGenerada = "";
 let zpubGenerada = "";
 
+function hexToBytes(hex) {
+    let bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+    }
+    return bytes;
+}
+
+function bytesToHex(buffer) {
+    return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function generarFraseCompleta() {
     const bytes = new Uint8Array(32);
     window.crypto.getRandomValues(bytes);
@@ -742,6 +762,106 @@ async function derivarSeedDesdeFrase() {
     }
 }
 
+/* ===== CRIPTOGRAFÍA BIP32/BIP84 (implementación local, sin librerías externas) ===== */
+const SECP256K1_N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n;
+const SECP256K1_P = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2Fn;
+const SECP256K1_G = {x:0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798n,y:0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8n};
+
+function hexToBigInt(hex){ return BigInt('0x' + hex); }
+function bigIntToBytes(v,len=32){ const out=new Uint8Array(len); for(let i=len-1;i>=0;i--){out[i]=Number(v&255n);v>>=8n;} return out; }
+function bytesToBigInt(b){ let v=0n; for(const x of b)v=(v<<8n)+BigInt(x); return v; }
+function concatBytes(...arrays){ const n=arrays.reduce((a,b)=>a+b.length,0); const out=new Uint8Array(n); let p=0; for(const a of arrays){out.set(a,p);p+=a.length;} return out; }
+function ser32(v){ const x=new Uint8Array(4); x[0]=(v>>>24)&255; x[1]=(v>>>16)&255; x[2]=(v>>>8)&255; x[3]=v&255; return x; }
+function mod(a,m){a%=m; return a<0n?a+m:a;}
+function modPow(a,e,m){let r=1n;a=mod(a,m);while(e){if(e&1n)r=r*a%m;a=a*a%m;e>>=1n;}return r;}
+function modInv(a,m){return modPow(mod(a,m),m-2n,m);}
+function pointAdd(A,B){
+    if(!A)return B; if(!B)return A;
+    if(A.x===B.x){ if(mod(A.y+B.y,SECP256K1_P)===0n)return null; const lam=mod((3n*A.x*A.x)*modInv(2n*A.y,SECP256K1_P),SECP256K1_P); const x=mod(lam*lam-2n*A.x,SECP256K1_P); return {x,y:mod(lam*(A.x-x)-A.y,SECP256K1_P)}; }
+    const lam=mod((B.y-A.y)*modInv(B.x-A.x,SECP256K1_P),SECP256K1_P); const x=mod(lam*lam-A.x-B.x,SECP256K1_P); return {x,y:mod(lam*(A.x-x)-A.y,SECP256K1_P)};
+}
+function pointMultiply(k,P=SECP256K1_G){let R=null,Q=P; while(k>0n){if(k&1n)R=pointAdd(R,Q);Q=pointAdd(Q,Q);k>>=1n;}return R;}
+function derivePublicKey(priv){
+    const P=pointMultiply(bytesToBigInt(priv)); if(!P)throw new Error('Clave privada inválida.');
+    const out=new Uint8Array(33); out[0]=(P.y&1n)?3:2; out.set(bigIntToBytes(P.x,32),1); return out;
+}
+
+async function hmacSha512(key,data){
+    const k=await crypto.subtle.importKey('raw',key,{name:'HMAC',hash:'SHA-512'},false,['sign']);
+    return new Uint8Array(await crypto.subtle.sign('HMAC',k,data));
+}
+async function sha256(data){return new Uint8Array(await crypto.subtle.digest('SHA-256',data));}
+
+/* RIPEMD-160 */
+const R160_R1=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,7,4,13,1,10,6,15,3,12,0,9,5,2,14,11,8,3,10,14,4,9,15,8,1,2,7,0,6,13,11,5,12,1,9,11,10,0,8,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13];
+const R160_R2=[5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,1,3,8,11,0,5,2,4,10,15,14,1,9,12,3,7,6,13,8,5,11,2,10,14,0,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13];
+/* The second array above is intentionally replaced with the canonical 80-entry schedule below. */
+const RIPEMD_R2=[5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,1,3,8,11,0,5,2,4,10,15,14,1,9,12,3,7,6,13,8,5,11,2,10,14,0,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13];
+/* Correct canonical RIPEMD-160 right-line message order (80 values). */
+const RR=[5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,12,15,10,4,1,5,8,7,6,2,13,14,0,3,9,11];
+/* RIPEMD-160 actually uses 5 rounds x 16; RR is supplied as the standard 80-entry table. */
+const RL=[11,14,15,12,5,8,7,9,11,13,14,15,6,7,9,8,7,6,8,13,11,9,7,15,7,12,15,9,11,7,13,12,11,13,6,7,14,9,13,15,14,8,13,6,5,12,7,5,11,12,14,15,14,15,9,8,9,14,5,6,8,6,5,12,9,15,5,11,6,8,13,12,5,12,13,14,11,8,5,6];
+const RS=[8,9,9,11,13,15,15,5,7,7,8,11,14,14,12,6,9,13,15,7,12,8,9,11,7,7,12,7,6,15,13,11,9,7,15,11,8,6,6,14,12,13,5,14,13,13,7,5,15,5,8,11,14,14,6,14,6,9,12,9,12,5,15,8,8,5,12,9,12,5,14,6,8,13,6,5,15,13,11,11];
+const KL=[0x00000000,0x5A827999,0x6ED9EBA1,0x8F1BBCDC,0xA953FD4E], KR=[0x50A28BE6,0x5C4DD124,0x6D703EF3,0x7A6D76E9,0x00000000];
+function rol(x,n){return ((x<<n)|(x>>>(32-n)))>>>0;}
+function f160(j,x,y,z){if(j<16)return x^y^z;if(j<32)return (x&y)|(~x&z);if(j<48)return (x|~y)^z;if(j<64)return (x&z)|(y&~z);return x^(y|~z);}
+function ripemd160(data){
+    const bitLen=data.length*8, blocks=Math.ceil((data.length+9)/64), m=new Uint8Array(blocks*64); m.set(data); m[data.length]=0x80;
+    let L=bitLen; for(let i=0;i<8;i++){m[m.length-8+i]=L&255;L=Math.floor(L/256);}
+    let h0=0x67452301,h1=0xEFCDAB89,h2=0x98BADCFE,h3=0x10325476,h4=0xC3D2E1F0;
+    for(let b=0;b<blocks;b++){
+        const X=new Uint32Array(16); for(let i=0;i<16;i++){const p=b*64+i*4;X[i]=(m[p]|m[p+1]<<8|m[p+2]<<16|m[p+3]<<24)>>>0;}
+        let al=h0,bl=h1,cl=h2,dl=h3,el=h4, ar=h0,br=h1,cr=h2,dr=h3,er=h4;
+        for(let j=0;j<80;j++){
+            let T=(rol((al+f160(j,bl,cl,dl)+X[R160_R1[j]]+KL[Math.floor(j/16)])>>>0,RL[j])+el)>>>0; al=el;el=dl;dl=rol(cl,10);cl=bl;bl=T;
+            T=(rol((ar+f160(79-j,br,cr,dr)+X[RR[j]]+KR[Math.floor(j/16)])>>>0,RS[j])+er)>>>0; ar=er;er=dr;dr=rol(cr,10);cr=br;br=T;
+        }
+        const T=(h1+cl+dr)>>>0; h1=(h2+dl+er)>>>0; h2=(h3+el+ar)>>>0; h3=(h4+al+br)>>>0; h4=(h0+bl+cr)>>>0; h0=T;
+    }
+    const out=new Uint8Array(20), H=[h0,h1,h2,h3,h4]; for(let i=0;i<5;i++)for(let j=0;j<4;j++)out[i*4+j]=(H[i]>>>(8*j))&255; return out;
+}
+async function hash160(data){return ripemd160(await sha256(data));}
+async function getParentFingerprint(priv){const pub=derivePublicKey(priv);const h=await hash160(pub);return (h[0]*0x1000000+h[1]*0x10000+h[2]*0x100+h[3])>>>0;}
+
+async function derivarHijoHardened(parentPriv,parentChain,index){
+    if(!Number.isInteger(index)||index<0||index>0x7fffffff)throw new Error('Índice hardened inválido.');
+    const i=(index+0x80000000)>>>0;
+    const data=concatBytes(new Uint8Array([0]),parentPriv,ser32(i));
+    const I=await hmacSha512(parentChain,data), IL=I.slice(0,32), IR=I.slice(32);
+    const k=bytesToBigInt(IL), p=bytesToBigInt(parentPriv); if(k>=SECP256K1_N)throw new Error('Derivación inválida (IL >= n).');
+    const child=mod(k+p,SECP256K1_N); if(child===0n)throw new Error('Derivación inválida (clave hija = 0).');
+    return {privKey:bigIntToBytes(child),chainCode:IR};
+}
+async function derivarHijoNormal(parentPriv,parentChain,index){
+    if(!Number.isInteger(index)||index<0||index>0x7fffffff)throw new Error('Índice inválido.');
+    const pub=derivePublicKey(parentPriv), data=concatBytes(pub,ser32(index));
+    const I=await hmacSha512(parentChain,data), k=bytesToBigInt(I.slice(0,32)); if(k>=SECP256K1_N)throw new Error('Derivación inválida (IL >= n).');
+    const child=mod(k+bytesToBigInt(parentPriv),SECP256K1_N); if(child===0n)throw new Error('Derivación inválida (clave hija = 0).');
+    return {privKey:bigIntToBytes(child),chainCode:I.slice(32)};
+}
+
+const BASE58='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+function base58Encode(bytes){let n=bytesToBigInt(bytes),s='';while(n){const r=Number(n%58n);s=BASE58[r]+s;n/=58n;}for(const b of bytes){if(b!==0)break;s='1'+s;}return s||'1';}
+async function addChecksumAndBase58Async(data){const c=(await sha256(await sha256(data))).slice(0,4);return base58Encode(concatBytes(data,c));}
+function buildExtendedKeyWithMetadata(keyData,chainCode,version,depth,parentFingerprint,childNumber,isPublic){
+    const out=new Uint8Array(78);out.set(ser32(version),0);out[4]=depth;out.set(ser32(parentFingerprint>>>0),5);out.set(ser32(childNumber>>>0),9);out.set(chainCode,13);
+    if(isPublic)out.set(keyData,45);else{out[45]=0;out.set(keyData,46);} return out;
+}
+async function privateKeyToWIF(priv){const payload=concatBytes(new Uint8Array([0x80]),priv,new Uint8Array([0x01]));return addChecksumAndBase58Async(payload);}
+function convertBits(data,fromBits,toBits,pad=true){let acc=0,bits=0,ret=[];const maxv=(1<<toBits)-1,maxAcc=(1<<(fromBits+toBits-1))-1;for(const value of data){if(value<0||(value>>fromBits)!==0)throw new Error('convertBits inválido');acc=((acc<<fromBits)|value)&maxAcc;bits+=fromBits;while(bits>=toBits){bits-=toBits;ret.push((acc>>bits)&maxv);}}if(pad){if(bits)ret.push((acc<<(toBits-bits))&maxv);}else if(bits>=fromBits||((acc<<(toBits-bits))&maxv))throw new Error('Padding inválido');return ret;}
+const BECH32='qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+function bech32Polymod(v){let c=1;const g=[0x3b6a57b2,0x26508e6d,0x1ea119fa,0x3d4233dd,0x2a1462b3];for(const x of v){const top=c>>>25;c=((c&0x1ffffff)<<5)^x;for(let i=0;i<5;i++)if((top>>>i)&1)c^=g[i];}return c>>>0;}
+function bech32HrpExpand(hrp){const a=[];for(const c of hrp)a.push(c.charCodeAt(0)>>5);a.push(0);for(const c of hrp)a.push(c.charCodeAt(0)&31);return a;}
+function bech32Encode(hrp,data){const values=bech32HrpExpand(hrp).concat(data,[0,0,0,0,0,0]);const pm=bech32Polymod(values)^1;const chk=[];for(let p=0;p<6;p++)chk.push((pm>>>(5*(5-p)))&31);return hrp+'1'+data.concat(chk).map(v=>BECH32[v]).join('');}
+function p2wpkhAddress(pubHash){return bech32Encode('bc',[0].concat(convertBits(Array.from(pubHash),8,5,true)));}
+
+async function derivarDireccionDesdeHijo(priv){const pub=derivePublicKey(priv);return {address:p2wpkhAddress(await hash160(pub)),pub,wif:await privateKeyToWIF(priv)};}
+
+async function copiarTexto(variable,nombre){try{const valor=window[variable];if(!valor)throw new Error('No hay ningún valor para copiar.');await navigator.clipboard.writeText(valor);alert(nombre+' copiado.');}catch(e){alert('No se pudo copiar: '+e.message);}}
+async function copiarFrase(){if(fraseGenerada)await navigator.clipboard.writeText(fraseGenerada);}
+async function copiarSeed(){if(seedGenerada)await navigator.clipboard.writeText(bytesToHex(seedGenerada));}
+function mostrarTab(tab){const r=document.getElementById('tabla-recepcion-container'),c=document.getElementById('tabla-cambio-container'),rb=document.getElementById('tab-rec-btn'),cb=document.getElementById('tab-cam-btn');if(!r||!c)return;if(tab==='recepcion'){r.style.display='block';c.style.display='none';if(rb)rb.classList.add('active');if(cb)cb.classList.remove('active');}else{r.style.display='none';c.style.display='block';if(cb)cb.classList.add('active');if(rb)rb.classList.remove('active');}}
+
 async function derivarClaveMaestra() {
     if (!seedGenerada) return alert('⚠️ Deriva la Seed antes de continuar.');
     
@@ -797,360 +917,56 @@ async function derivarClaveMaestra() {
 
 async function generar200Direcciones() {
     if (!zprvGenerada) return alert('⚠️ Debes derivar la Clave Maestra primero.');
-
-    const btnHeader = document.getElementById('btn-derivar-direcciones-header');
-    const btnPaso = document.getElementById('btn-derivar-direcciones-paso');
-    const loadingHeader = document.getElementById('dir-loading-header');
-    const loadingPaso = document.getElementById('dir-loading');
-
-    btnHeader.disabled = true;
-    btnPaso.disabled = true;
-    loadingHeader.style.display = 'inline';
-    loadingPaso.style.display = 'inline';
-
-    await new Promise(r => setTimeout(r, 20));
-
-    try {
-        const accountPrivKey = hexToBytes(document.getElementById('xprv-private-key').textContent);
-        const accountChainCode = hexToBytes(document.getElementById('xprv-chain-code').textContent);
-
-        const branchRecepcion = await derivarHijoNormal(accountPrivKey, accountChainCode, 0);
-        const branchCambio = await derivarHijoNormal(accountPrivKey, accountChainCode, 1);
-
-        const fillTable = async (bodyId, branch) => {
-            const body = document.getElementById(bodyId);
-            let rowsHtml = '';
-
-            for (let i = 0; i < 100; i++) {
-                const leaf = await derivarHijoNormal(branch.privKey, branch.chainCode, i);
-                const pubKey = derivePublicKey(leaf.privKey);
-                const address = await pubKeyToBech32(pubKey);
-                const wif = await privKeyToWIF(leaf.privKey);
-
-                rowsHtml += `<tr style="border-bottom: 1px solid #1e293b;">
-                    <td style="padding: 6px; color:#64748b;">${i}</td>
-                    <td style="padding: 6px; font-weight:bold;">${address}</td>
-                    <td style="padding: 6px; color:#e2e8f0;">${bytesToHex(pubKey)}</td>
-                    <td style="padding: 6px; color:#a855f7;">${wif}</td>
-                </tr>`;
-
-                if (i % 25 === 0) {
-                    await new Promise(resolve => setTimeout(resolve, 0));
-                }
-            }
-
-            body.innerHTML = rowsHtml;
-        };
-
-        await fillTable('tabla-recepcion-body', branchRecepcion);
-        await fillTable('tabla-cambio-body', branchCambio);
-
-        document.getElementById('direcciones-section').style.display = 'block';
-    } catch (err) {
-        alert("Error al generar direcciones: " + err.message);
-    } finally {
-        btnHeader.disabled = false;
-        btnPaso.disabled = false;
-        loadingHeader.style.display = 'none';
-        loadingPaso.style.display = 'none';
-    }
-}
-
-async function getParentFingerprint(privKey) {
-    const pubKey = derivePublicKey(privKey);
-    const sha = await window.crypto.subtle.digest('SHA-256', pubKey);
-    const hash = ripemd160(new Uint8Array(sha));
-    return ((hash[0] << 24) | (hash[1] << 16) | (hash[2] << 8) | hash[3]) >>> 0;
-}
-
-// FUNCIONES AUXILIARES CRIPTOGRÁFICAS
-async function derivarHijoHardened(parentPrivKey, parentChainCode, index) {
-    const data = new Uint8Array(37);
-    data[0] = 0x00;
-    data.set(parentPrivKey, 1);
-    new DataView(data.buffer).setUint32(33, index + 0x80000000, false);
-    
-    const cryptoKey = await window.crypto.subtle.importKey('raw', parentChainCode, { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']);
-    const I = new Uint8Array(await window.crypto.subtle.sign('HMAC', cryptoKey, data));
-    
-    const childBigInt = (bytesToBigInt(I.slice(0, 32)) + bytesToBigInt(parentPrivKey)) % SECP256K1.n;
-    if (childBigInt === 0n) throw new Error("Derivación inválida (clave cero)");
-    return { privKey: bigIntToBytes(childBigInt, 32), chainCode: I.slice(32, 64) };
-}
-
-async function derivarHijoNormal(parentPrivKey, parentChainCode, index) {
-    const parentPubKey = derivePublicKey(parentPrivKey);
-    const data = new Uint8Array(37);
-    data.set(parentPubKey, 0);
-    new DataView(data.buffer).setUint32(33, index, false);
-
-    const cryptoKey = await window.crypto.subtle.importKey('raw', parentChainCode, { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']);
-    const I = new Uint8Array(await window.crypto.subtle.sign('HMAC', cryptoKey, data));
-
-    const childBigInt = (bytesToBigInt(I.slice(0, 32)) + bytesToBigInt(parentPrivKey)) % SECP256K1.n;
-    if (childBigInt === 0n) throw new Error("Derivación inválida (clave cero)");
-    return { privKey: bigIntToBytes(childBigInt, 32), chainCode: I.slice(32, 64) };
-}
-
-function buildExtendedKeyWithMetadata(keyData, chainCode, version, depth, parentFingerprint, childNumber, isPublic) {
-    const rawData = new Uint8Array(78);
-    const view = new DataView(rawData.buffer);
-    view.setUint32(0, version, false);
-    rawData[4] = depth;
-    view.setUint32(5, parentFingerprint, false);
-    view.setUint32(9, childNumber, false);
-    rawData.set(chainCode, 13);
-    if (!isPublic) {
-        rawData[45] = 0x00;
-        rawData.set(keyData, 46);
-    } else {
-        rawData.set(keyData, 45);
-    }
-    return rawData;
-}
-
-async function privKeyToWIF(privKey) {
-    const wifData = new Uint8Array(34);
-    wifData[0] = 0x80;
-    wifData.set(privKey, 1);
-    wifData[33] = 0x01;
-    return await addChecksumAndBase58Async(wifData);
-}
-
-async function pubKeyToBech32(pubKey) {
-    const pubKeyHash = ripemd160(new Uint8Array(await window.crypto.subtle.digest('SHA-256', pubKey)));
-    const words = convertBits(pubKeyHash, 8, 5, true);
-    const fullWords = new Uint8Array(words.length + 1);
-    fullWords[0] = 0;
-    fullWords.set(words, 1);
-    return encodeBech32('bc', fullWords);
-}
-
-// UTILIDADES Y BECH32/BASE58
-function hexToBytes(hex) {
-    const bytes = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < hex.length; i += 2) bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
-    return bytes;
-}
-
-function bytesToHex(buffer) {
-    return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function addChecksumAndBase58Async(data) {
-    const hash1 = await window.crypto.subtle.digest('SHA-256', data);
-    const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
-    const checksum = new Uint8Array(hash2).slice(0, 4);
-    
-    const finalData = new Uint8Array(data.length + 4);
-    finalData.set(data, 0);
-    finalData.set(checksum, data.length);
-    return encodeBase58(finalData);
-}
-
-function encodeBase58(bytes) {
-    const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-    let zeros = 0;
-    while (zeros < bytes.length && bytes[zeros] === 0) zeros++;
-    let number = BigInt('0x' + bytesToHex(bytes));
-    let result = '';
-    while (number > 0) {
-        result = ALPHABET[Number(number % 58n)] + result;
-        number /= 58n;
-    }
-    return '1'.repeat(zeros) + result;
-}
-
-function convertBits(data, frombits, tobits, pad) {
-    let acc = 0, bits = 0;
-    const ret = [], maxv = (1 << tobits) - 1;
-    for (let p = 0; p < data.length; p++) {
-        acc = (acc << frombits) | data[p];
-        bits += frombits;
-        while (bits >= tobits) {
-            bits -= tobits;
-            ret.push((acc >> bits) & maxv);
+    const loading=document.getElementById('dir-loading'); const headerLoading=document.getElementById('dir-loading-header');
+    const btn1=document.getElementById('btn-derivar-direcciones-paso'); const btn2=document.getElementById('btn-derivar-direcciones-header');
+    if(loading)loading.style.display='inline'; if(headerLoading)headerLoading.style.display='inline'; if(btn1)btn1.disabled=true;if(btn2)btn2.disabled=true;
+    try{
+        /* zpub/zprv del nodo cuenta -> derivamos 0 (externa) y 1 (cambio), ambas no endurecidas. */
+        let accountPriv=null,accountChain=null;
+        // Re-derivar desde la seed evita almacenar claves privadas adicionales en el DOM.
+        const master=await hmacSha512(new TextEncoder().encode('Bitcoin seed'),seedGenerada);
+        accountPriv=master.slice(0,32);accountChain=master.slice(32);
+        for(const i of [84,0,0]){const d=await derivarHijoHardened(accountPriv,accountChain,i);accountPriv=d.privKey;accountChain=d.chainCode;}
+        const rec=await derivarHijoNormal(accountPriv,accountChain,0), chg=await derivarHijoNormal(accountPriv,accountChain,1);
+        const recBody=document.getElementById('tabla-recepcion-body'),chgBody=document.getElementById('tabla-cambio-body'); if(recBody)recBody.innerHTML='';if(chgBody)chgBody.innerHTML='';
+        for(let i=0;i<100;i++){
+            const a=await derivarHijoNormal(rec.privKey,rec.chainCode,i);const x=await derivarDireccionDesdeHijo(a.privKey);
+            if(recBody)recBody.insertAdjacentHTML('beforeend',`<tr><td style="padding:6px;">${i}</td><td style="padding:6px;">${x.address}</td><td style="padding:6px;word-break:break-all;">${bytesToHex(x.pub)}</td><td style="padding:6px;word-break:break-all;">${x.wif}</td></tr>`);
+            const b=await derivarHijoNormal(chg.privKey,chg.chainCode,i);const y=await derivarDireccionDesdeHijo(b.privKey);
+            if(chgBody)chgBody.insertAdjacentHTML('beforeend',`<tr><td style="padding:6px;">${i}</td><td style="padding:6px;">${y.address}</td><td style="padding:6px;word-break:break-all;">${bytesToHex(y.pub)}</td><td style="padding:6px;word-break:break-all;">${y.wif}</td></tr>`);
         }
-    }
-    if (pad && bits > 0) ret.push((acc << (tobits - bits)) & maxv);
-    return ret;
-}
-
-function encodeBech32(hrp, data) {
-    const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
-    function polymod(values) {
-        let chk = 1;
-        for (let p = 0; p < values.length; ++p) {
-            const top = chk >> 25;
-            chk = ((chk & 0x1ffffff) << 5) ^ values[p];
-            for (let i = 0; i < 5; ++i) if ((top >> i) & 1) chk ^= [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3][i];
-        }
-        return chk;
-    }
-    function hrpExpand(hrp) {
-        const ret = [];
-        for (let i = 0; i < hrp.length; ++i) ret.push(hrp.charCodeAt(i) >> 5);
-        ret.push(0);
-        for (let i = 0; i < hrp.length; ++i) ret.push(hrp.charCodeAt(i) & 31);
-        return ret;
-    }
-    const combined = hrpExpand(hrp).concat(Array.from(data)).concat([0, 0, 0, 0, 0, 0]);
-    const mod = polymod(combined) ^ 1;
-    const checksum = [];
-    for (let p = 0; p < 6; ++p) checksum.push((mod >> (5 * (5 - p))) & 31);
-    return hrp + '1' + Array.from(data).concat(checksum).map(d => CHARSET[d]).join('');
-}
-
-// CURVA ELÍPTICA SECP256K1 & RIPEMD160
-const SECP256K1 = {
-    p: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2Fn,
-    n: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n,
-    Gx: 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798n,
-    Gy: 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8n,
-};
-
-function derivePublicKey(privateKey) {
-    const k = bytesToBigInt(privateKey);
-    if (k <= 0n || k >= SECP256K1.n) {
-        throw new Error("Clave privada fuera de rango");
-    }
-
-    const P = scalarMult(k, [SECP256K1.Gx, SECP256K1.Gy]);
-    if (!P) throw new Error("Punto al infinito");
-
-    const pubKey = new Uint8Array(33);
-    pubKey[0] = (P[1] & 1n) === 0n ? 0x02 : 0x03;
-    pubKey.set(bigIntToBytes(P[0], 32), 1);
-    return pubKey;
-}
-
-function scalarMult(k, point) {
-    let result = null;
-    let addend = point;
-    let scalar = k % SECP256K1.n;
-
-    if (scalar === 0n) return null;
-
-    while (scalar > 0n) {
-        if (scalar & 1n) result = pointAdd(result, addend);
-        addend = pointAdd(addend, addend);
-        scalar >>= 1n;
-    }
-    return result;
-}
-
-function pointAdd(p1, p2) {
-    if (!p1) return p2;
-    if (!p2) return p1;
-
-    const [x1, y1] = p1, [x2, y2] = p2, p = SECP256K1.p;
-
-    if (x1 === x2 && (y1 !== y2 || y1 === 0n)) {
-        return null;
-    }
-
-    let slope;
-    if (x1 === x2 && y1 === y2) {
-        slope = (3n * x1 * x1 * modInverse(2n * y1, p)) % p;
-    } else {
-        const num = (y2 - y1 + p) % p;
-        const den = (x2 - x1 + p) % p;
-        slope = (num * modInverse(den, p)) % p;
-    }
-
-    const x3 = (slope * slope - x1 - x2) % p;
-    const y3 = (slope * (x1 - x3) - y1) % p;
-
-    return [(x3 + p) % p, (y3 + p) % p];
-}
-
-function modInverse(a, m) {
-    let [old_r, r] = [(a % m + m) % m, m];
-    let [old_s, s] = [1n, 0n];
-
-    if (old_r === 0n) {
-        throw new Error("División por cero en modInverse");
-    }
-
-    while (r !== 0n) {
-        const q = old_r / r;
-        [old_r, r] = [r, old_r - q * r];
-        [old_s, s] = [s, old_s - q * s];
-    }
-    return (old_s % m + m) % m;
-}
-
-function bytesToBigInt(bytes) {
-    return BigInt('0x' + bytesToHex(bytes));
-}
-
-function bigIntToBytes(value, length) {
-    const hex = value.toString(16).padStart(length * 2, '0');
-    return hexToBytes(hex);
-}
-
-function ripemd160(message) {
-    var Z = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,7,4,13,1,10,6,15,3,12,0,9,5,2,14,11,8,3,10,14,4,9,15,8,1,2,7,0,6,13,11,5,12,1,9,11,10,0,8,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13];
-    var Zprime = [5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,12,15,10,4,1,5,8,7,6,2,13,14,0,3,9,11];
-    var S = [11,14,15,12,5,8,7,9,11,13,14,15,6,7,9,8,7,6,8,13,11,9,7,15,7,12,15,9,11,7,13,12,11,13,6,7,14,9,13,15,14,8,13,6,5,12,7,5,11,12,14,15,14,15,9,8,9,14,5,6,8,6,5,12,9,15,5,11,6,8,13,12,5,12,13,14,11,8,5,6];
-    var Sprime = [8,9,9,11,13,15,15,5,7,7,8,11,14,14,12,6,9,13,15,7,12,8,9,11,7,7,12,7,6,15,13,11,9,7,15,11,8,6,6,14,12,13,5,14,13,13,7,5,15,5,8,11,14,14,6,14,6,9,12,9,12,5,15,8,8,5,12,9,12,5,14,6,8,13,6,5,15,13,11,11];
-    function f(j, x, y, z) {
-        if (j < 16) return x ^ y ^ z;
-        if (j < 32) return (x & y) | (~x & z);
-        if (j < 48) return (x | ~y) ^ z;
-        if (j < 64) return (x & z) | (y & ~z);
-        return x ^ (y | ~z);
-    }
-    function rol(x, n) { return (x << n) | (x >>> (32 - n)); }
-    var n = message.length, wordCount = ((n + 8) >> 6) + 1, totalWords = wordCount * 16, X = new Int32Array(totalWords);
-    for (var i = 0; i < n; i++) X[i >> 2] |= message[i] << ((i % 4) * 8);
-    X[n >> 2] |= 0x80 << ((n % 4) * 8);
-    X[totalWords - 2] = n * 8;
-    var h0 = 0x67452301, h1 = 0xefcdab89, h2 = 0x98badcfe, h3 = 0x10325476, h4 = 0xc3d2e1f0;
-    for (var i = 0; i < totalWords; i += 16) {
-        var A = h0, B = h1, C = h2, D = h3, E = h4, Aprime = h0, Bprime = h1, Cprime = h2, Dprime = h3, Eprime = h4;
-        for (var j = 0; j < 80; j++) {
-            var K = (j<16)?0:(j<32)?0x5a827999:(j<48)?0x6ed9eba1:(j<64)?0x8f1bbcdc:0xa953fd4e;
-            var T = (A + f(j, B, C, D) + X[i + Z[j]] + K) | 0;
-            T = (rol(T, S[j]) + E) | 0;
-            A = E; E = D; D = rol(C, 10); C = B; B = T;
-            var Kprime = (j<16)?0x50a28be6:(j<32)?0x5c4dd124:(j<48)?0x6d703ef3:(j<64)?0x7a6d76e9:0;
-            var Tprime = (Aprime + f(79 - j, Bprime, Cprime, Dprime) + X[i + Zprime[j]] + Kprime) | 0;
-            Tprime = (rol(Tprime, Sprime[j]) + Eprime) | 0;
-            Aprime = Eprime; Eprime = Dprime; Dprime = rol(Cprime, 10); Cprime = Bprime; Bprime = Tprime;
-        }
-        var T = (h1 + C + Dprime) | 0;
-        h1 = (h2 + D + Eprime) | 0; h2 = (h3 + E + Aprime) | 0; h3 = (h4 + A + Bprime) | 0; h4 = (h0 + B + Cprime) | 0; h0 = T;
-    }
-    var result = new Uint8Array(20), h = [h0, h1, h2, h3, h4];
-    for (var i = 0; i < 5; i++) {
-        result[i * 4] = h[i] & 0xff; result[i * 4 + 1] = (h[i] >>> 8) & 0xff;
-        result[i * 4 + 2] = (h[i] >>> 16) & 0xff; result[i * 4 + 3] = (h[i] >>> 24) & 0xff;
-    }
-    return result;
-}
-
-// FUNCIONES DE COPIADO Y UI
-function copiarFrase() {
-    navigator.clipboard.writeText(fraseGenerada).then(() => alert('¡Frase copiada!'));
-}
-function copiarSeed() {
-    navigator.clipboard.writeText(bytesToHex(seedGenerada)).then(() => alert('¡Seed copiada!'));
-}
-function copiarTexto(varName, label) {
-    const val = varName === 'zprvGenerada' ? zprvGenerada : zpubGenerada;
-    navigator.clipboard.writeText(val).then(() => alert('¡' + label.toUpperCase() + ' copiado!'));
-}
-function mostrarTab(tipo) {
-    document.getElementById('tabla-recepcion-container').style.display = tipo === 'recepcion' ? 'block' : 'none';
-    document.getElementById('tabla-cambio-container').style.display = tipo === 'cambio' ? 'block' : 'none';
-    document.getElementById('tab-rec-btn').style.background = tipo === 'recepcion' ? '#38bdf8' : '#e2e8f0';
-    document.getElementById('tab-cam-btn').style.background = tipo === 'cambio' ? '#f7931a' : '#e2e8f0';
+        const sec=document.getElementById('direcciones-section');if(sec)sec.style.display='block';mostrarTab('recepcion');
+    }catch(e){alert('Error al derivar direcciones: '+e.message);}finally{if(loading)loading.style.display='none';if(headerLoading)headerLoading.style.display='none';if(btn1)btn1.disabled=false;if(btn2)btn2.disabled=false;}
 }
 </script>
 
 <footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
-    <p>© 2026 <strong>clavebit.com</strong> | Licencia MIT</p>
+    <p>
+        © 2026 <strong>clavebit.com</strong> | 
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
+        | Cero analíticas, cero rastreo, privacidad absoluta
+    </p>
+    
+    <p>
+        Web educativa creada por un matemático anónimo entusiasta de Bitcoin. Cualquier duda o consulta <b>info@clavebit.com</b>
+    </p> 
+     
+    <p>
+        Para apoyar el proyecto puede hacer una donación
+    </p>
+    
+    <p>
+        Dirección Bitcoin:
+    </p>	
+	
+    <p>
+        <b>bc1q8tzdrqrpl9p33xc5cvk2an68cct7ep58eqklx7</b>
+    </p>
+	
+    <p>
+        Gracias por adelantado y un saludo
+    </p>
 </footer>
 
 </body>
