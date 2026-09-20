@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de transacciones Bitcoin | ClaveBit</title>
+<meta name="description" content="Construye una transacción Bitcoin P2WPKH paso a paso con ClaveBit.">
+<link rel="icon" href="./favicon.ico" type="image/x-icon">
+<link rel="canonical" href="https://clavebit.com/transaccion.html">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://mempool.space; object-src 'none'; img-src 'self' data:;">
+<style>
+
+        .crypto-generator-container {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            box-sizing: border-box;
+            color: #1e293b;
+        }
+
+        /* Estilos para el Título y Descripción Solicitados */
+        .header-proyecto {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+
+        .main-titulo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+        }
+
+        .main-descripcion {
+            font-size: 1rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Contenedor de Botones en Rejilla Responsiva */
+        .grid-botones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .grid-botones button {
+            border: none;
+            padding: 12px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 50px;
+        }
+
+        .grid-botones button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            filter: brightness(1.05);
+        }
+
+        .grid-botones button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        /* Estructura de los Pasos */
+        .paso-seccion {
+            margin-bottom: 24px;
+            padding: 16px 16px 16px 20px;
+            border-radius: 0 12px 12px 0;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .paso-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .paso-titulo {
+            margin: 0 0 8px 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .paso-descripcion {
+            margin: 0 0 12px 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #475569;
+        }
+
+        .paso-subetiqueta {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin: 8px 0 4px 0;
+            font-weight: 600;
+        }
+
+        /* Bloques de Código/Consola Terminal */
+        .terminal-box {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 14px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            word-break: break-all;
+            white-space: pre-wrap;
+            min-height: 24px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Sección Especial de Resumen */
+        .seccion-resumen {
+            background: #fffbeb;
+            border: 2px dashed #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        /* Colores Temáticos por Paso */
+        .p1 { border-left: 4px solid #f7931a; } .p1 .paso-tag { color: #f7931a; }
+        .p2 { border-left: 4px solid #e11d48; } .p2 .paso-tag { color: #e11d48; }
+        .p3 { border-left: 4px solid #2563eb; } .p3 .paso-tag { color: #2563eb; }
+        .p4 { border-left: 4px solid #10b981; } .p4 .paso-tag { color: #10b981; }
+        .p5 { border-left: 4px solid #0284c7; } .p5 .paso-tag { color: #0284c7; }
+        .p6 { border-left: 4px solid #06b6d4; } .p6 .paso-tag { color: #06b6d4; }
+        .p7 { border-left: 4px solid #7c3aed; } .p7 .paso-tag { color: #7c3aed; }
+
+        /* Estilos específicos del generador de transacciones */
+        .transaction-form {
+            display: grid;
+            gap: 14px;
+        }
+        .campo {
+            display: grid;
+            gap: 6px;
+        }
+        .campo label {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #0f172a;
+        }
+        .campo small {
+            color: #64748b;
+            line-height: 1.45;
+        }
+        .campo input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.9rem;
+            background: #fff;
+            color: #0f172a;
+            outline: none;
+        }
+        .campo input:focus {
+            border-color: #f7931a;
+            box-shadow: 0 0 0 3px rgba(247,147,26,.12);
+        }
+        .btn-principal {
+            border: none;
+            padding: 13px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            background: #f7931a;
+            color: #fff;
+            font-size: .9rem;
+        }
+        .btn-principal:hover { filter: brightness(1.05); }
+        .btn-principal:disabled {
+            cursor: not-allowed;
+            background: #e2e8f0;
+            color: #a0aec0;
+        }
+        .resultado-grid {
+            display: grid;
+            gap: 10px;
+        }
+        .dato {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 11px 13px;
+        }
+        .dato strong {
+            display: block;
+            color: #64748b;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: 5px;
+        }
+        .dato code {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            word-break: break-all;
+            color: #0f172a;
+        }
+        .estado {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: .85rem;
+        }
+        .estado.ok {
+            background: #ecfdf5;
+            color: #047857;
+        }
+        .estado.error {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .gastado-box {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .disponible-box {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #a7f3d0;
+            background: #ecfdf5;
+            color: #047857;
+        }
+        .estado-link {
+            display: inline-block;
+            margin-top: 7px;
+            color: #f7931a;
+            font-weight: 700;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+</style>
+</head>
+<body>
+
+<div class="crypto-generator-container">
+
+
+
+
+    <div class="header-proyecto">
+	
+        <p class="main-descripcion" style="color: #f7931a;">
+            &gt;&gt; <a href="https://clavebit.com/billeterahd.html" rel="noopener" style="text-decoration: none;color: orange;">Billetera HD (BIP39/BIP84)</a>
+			
+        </p>
+		
+		   <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com" rel="noopener" style="text-decoration: none; color: orange;">Clave privada, pública y dirección</a></p> 
+
+        <p class="main-descripcion" style="color: #f7931a;">
+            &gt;&gt; <a href="https://clavebit.com/radar.html" rel="noopener" style="text-decoration: none;color: orange;">Consolidación de UTXOs</a>
+        </p>
+        <p class="main-descripcion" style="color: #f7931a;">
+            &gt;&gt; <a href="https://clavebit.com/rbf.html" rel="noopener" style="text-decoration: none;color: orange;">Rescatar transacción</a>
+        </p>
+
+        <h1 class="main-titulo">Generador de transacciones Bitcoin</h1>
+        <p class="main-descripcion">
+            Construye una transacción Bitcoin paso a paso. Empezamos seleccionando un UTXO
+            P2WPKH (bc1q) que queremos gastar.
+        </p>
+    </div>
+
+    <div class="paso-seccion p1">
+        <span class="paso-tag">PASO 1: SELECCIONAR UTXO</span>
+        <h4 class="paso-titulo">Elegir el UTXO que vamos a gastar</h4>
+        <p class="paso-descripcion">
+            Una transacción Bitcoin no empieza indicando simplemente una cantidad.
+            Primero debemos elegir una salida no gastada (UTXO) de una transacción anterior.
+            Para identificarla necesitamos su TXID y el índice de salida (<b>vout</b>).
+        </p>
+
+        <div class="transaction-form">
+            <div class="campo">
+                <label for="txid">TXID de la transacción anterior</label>
+                <small>Identificador de 64 caracteres hexadecimales de la transacción que creó el UTXO.</small>
+                <input id="txid" type="text" maxlength="64" autocomplete="off"
+                       spellcheck="false" placeholder="64 caracteres hexadecimales">
+            </div>
+
+            <div class="campo">
+                <label for="vout">Vout</label>
+                <small>Índice de la salida que queremos gastar. El primer output es 0.</small>
+                <input id="vout" type="number" min="0" step="1" inputmode="numeric"
+                       placeholder="Ejemplo: 0">
+            </div>
+
+            <button id="btn-consultar" class="btn-principal" type="button" onclick="consultarUTXO()">
+                Consultar UTXO
+            </button>
+        </div>
+
+        <div id="estado" class="estado" aria-live="polite">
+            Introduce el TXID y el vout para consultar la salida anterior.
+        </div>
+
+        <div id="estado-gastado" style="display:none;"></div>
+    </div>
+
+    <div id="resultado" class="paso-seccion p2" style="display:none;">
+        <span class="paso-tag">UTXO DISPONIBLE</span>
+        <h4 class="paso-titulo">Datos de la salida que vamos a gastar</h4>
+        <p class="paso-descripcion">
+            Esta salida pertenece a la transacción anterior y, al estar sin gastar,
+            puede utilizarse como input de nuestra nueva transacción.
+        </p>
+
+        <div class="disponible-box">
+            <b>✓ UTXO no gastado</b><br>
+            Esta salida sigue siendo un UTXO disponible.
+        </div>
+
+        <div class="resultado-grid" style="margin-top:14px;">
+            <div class="dato">
+                <strong>TXID</strong>
+                <code id="out-txid"></code>
+            </div>
+            <div class="dato">
+                <strong>Vout</strong>
+                <code id="out-vout"></code>
+            </div>
+            <div class="dato">
+                <strong>Valor</strong>
+                <code id="out-value"></code>
+            </div>
+            <div class="dato">
+                <strong>Dirección</strong>
+                <code id="out-address"></code>
+            </div>
+            <div class="dato">
+                <strong>Tipo</strong>
+                <code id="out-type"></code>
+            </div>
+            <div class="dato">
+                <strong>ScriptPubKey</strong>
+                <code id="out-script"></code>
+            </div>
+        </div>
+    </div>
+
+    <div id="gastado" class="paso-seccion p2" style="display:none;">
+        <span class="paso-tag">UTXO NO DISPONIBLE</span>
+        <h4 class="paso-titulo">Esta salida ya ha sido gastada</h4>
+        <p class="paso-descripcion">
+            El output indicado ya fue utilizado como input de otra transacción.
+            Por tanto, ya no es un UTXO y no puede volver a utilizarse en una nueva transacción.
+        </p>
+
+        <div class="gastado-box">
+            <b>✕ UTXO gastado</b><br>
+            <span id="gastado-txt"></span>
+            <br>
+            <a id="gastado-link" class="estado-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+        </div>
+    </div>
+
+    <div id="explicacion" class="paso-seccion p3" style="display:none;">
+        <span class="paso-tag">¿QUÉ ACABAMOS DE SELECCIONAR?</span>
+        <h4 class="paso-titulo">De output anterior a input nuevo</h4>
+        <p class="paso-descripcion">
+            La transacción anterior creó una salida con una cantidad de satoshis y una
+            condición de gasto. Mientras esa salida no se haya gastado, es un UTXO.
+            Nuestra nueva transacción hará referencia a ese UTXO mediante TXID + vout.
+        </p>
+
+        <div class="terminal-box">TRANSACCIÓN ANTERIOR
+        │
+        └── OUTPUT #<span id="exp-vout">0</span>
+              │
+              ├── <span id="exp-value">0</span> sats
+              │
+              └── scriptPubKey
+                    │
+                    ▼
+                   UTXO
+                    │
+                    │ gastar
+                    ▼
+NUEVA TRANSACCIÓN
+        │
+        └── INPUT #0</div>
+
+        <p class="paso-descripcion" style="margin-top:12px;">
+            Como esta primera versión se centra en direcciones <b>bc1q</b>,
+            aceptamos únicamente outputs <b>P2WPKH / SegWit nativo</b>.
+        </p>
+    </div>
+
+</div>
+
+<footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
+    <p>
+        © 2026 <strong>clavebit.com</strong> | 
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
+     | Cero analíticas, cero rastreo, privacidad absoluta
+	</p>
+	
+	<p>
+	 Web educativa creada por un matemático anónimo entusiasta de Bitcoin. Cualquier duda o consulta <b>info@clavebit.com</b>
+	 </p> 
+	 
+	 <p>
+	 Para apoyar el proyecto puede hacer una donación
+	</p>
+    <p>
+	 Dirección Bitcoin:
+	</p>	
+	
+	<p>
+	<b>bc1q8tzdrqrpl9p33xc5cvk2an68cct7ep58eqklx7</b>
+	</p>
+	
+	<p>
+	Gracias por adelantado y un saludo
+	</p>
+</footer>
+
+<script>
+const API_BASE = "https://mempool.space/api";
+
+function mostrarEstado(texto, tipo = "") {
+    const el = document.getElementById("estado");
+    el.textContent = texto;
+    el.className = "estado" + (tipo ? " " + tipo : "");
+}
+
+function ocultarResultados() {
+    document.getElementById("resultado").style.display = "none";
+    document.getElementById("gastado").style.display = "none";
+    document.getElementById("explicacion").style.display = "none";
+}
+
+function esTxidValido(txid) {
+    return /^[0-9a-fA-F]{64}$/.test(txid);
+}
+
+function esP2WPKHMainnet(salida) {
+    const tipo = salida.scriptpubkey_type || "";
+    const direccion = salida.scriptpubkey_address || "";
+    return tipo === "v0_p2wpkh" && direccion.startsWith("bc1q");
+}
+
+function limpiarHashHex(valor) {
+    return typeof valor === "string" && /^[0-9a-fA-F]{64}$/.test(valor)
+        ? valor.toLowerCase()
+        : "";
+}
+
+function mostrarSalida(tx, txid, vout, salida) {
+    const value = Number(salida.value);
+
+    document.getElementById("out-txid").textContent = txid;
+    document.getElementById("out-vout").textContent = vout;
+    document.getElementById("out-value").textContent =
+        `${value.toLocaleString("es-ES")} sats`;
+    document.getElementById("out-address").textContent =
+        salida.scriptpubkey_address || "—";
+    document.getElementById("out-type").textContent =
+        "P2WPKH (SegWit nativo, bc1q)";
+    document.getElementById("out-script").textContent =
+        salida.scriptpubkey || "—";
+
+    document.getElementById("exp-vout").textContent = vout;
+    document.getElementById("exp-value").textContent =
+        value.toLocaleString("es-ES");
+
+    document.getElementById("resultado").style.display = "block";
+    document.getElementById("explicacion").style.display = "block";
+}
+
+async function consultarUTXO() {
+    const txid = document.getElementById("txid").value.trim().toLowerCase();
+    const voutTexto = document.getElementById("vout").value.trim();
+    const vout = Number(voutTexto);
+    const boton = document.getElementById("btn-consultar");
+
+    ocultarResultados();
+
+    if (!esTxidValido(txid)) {
+        mostrarEstado("El TXID debe contener exactamente 64 caracteres hexadecimales.", "error");
+        return;
+    }
+
+    if (voutTexto === "" || !Number.isInteger(vout) || vout < 0) {
+        mostrarEstado("El vout debe ser un número entero igual o mayor que 0.", "error");
+        return;
+    }
+
+    boton.disabled = true;
+    mostrarEstado("Consultando la transacción anterior...");
+
+    try {
+        const respuesta = await fetch(`${API_BASE}/tx/${txid}`);
+
+        if (!respuesta.ok) {
+            if (respuesta.status === 404) {
+                throw new Error("La transacción no existe en mempool.space.");
+            }
+            if (respuesta.status === 429) {
+                throw new Error("Límite de peticiones alcanzado en mempool.space. Inténtalo de nuevo más tarde.");
+            }
+            throw new Error(`No se ha podido consultar la transacción (HTTP ${respuesta.status}).`);
+        }
+
+        const tx = await respuesta.json();
+
+        if (!Array.isArray(tx.vout) || !tx.vout[vout]) {
+            throw new Error("Ese vout no existe en la transacción indicada.");
+        }
+
+        const salida = tx.vout[vout];
+
+        // Comprobación 1: debe ser P2WPKH mainnet / bc1q.
+        if (!esP2WPKHMainnet(salida)) {
+            throw new Error(
+                "El vout seleccionado no es un P2WPKH mainnet (bc1q). Selecciona una salida bc1q."
+            );
+        }
+
+        /*
+         * Comprobación 2: saber si el output ya ha sido gastado.
+         * mempool.space expone el endpoint /tx/:txid/outspend/:vout.
+         * Si spent=true, la propiedad "txid" identifica la transacción que lo consumió.
+         */
+        const respuestaGasto = await fetch(
+            `${API_BASE}/tx/${txid}/outspend/${vout}`
+        );
+
+        if (!respuestaGasto.ok) {
+            if (respuestaGasto.status === 429) {
+                throw new Error("Límite de peticiones alcanzado en mempool.space. Inténtalo de nuevo más tarde.");
+            }
+            throw new Error(
+                `No se pudo comprobar el estado de gasto del UTXO (HTTP ${respuestaGasto.status}).`
+            );
+        }
+
+        const gasto = await respuestaGasto.json();
+
+        if (gasto.spent === true) {
+            // Se comprueba tanto gasto.txid como gasto.spent_txid por compatibilidad
+            const spendTxid = limpiarHashHex(gasto.txid || gasto.spent_txid);
+
+            document.getElementById("gastado-txt").textContent =
+                spendTxid
+                    ? `Fue gastado por la transacción ${spendTxid}.`
+                    : "Fue gastado por otra transacción.";
+
+            const link = document.getElementById("gastado-link");
+
+            if (spendTxid) {
+                link.href = `https://mempool.space/tx/${spendTxid}`;
+                link.textContent = "Ver transacción que lo gastó en mempool.space";
+                link.style.display = "inline-block";
+            } else {
+                link.style.display = "none";
+            }
+
+            document.getElementById("gastado").style.display = "block";
+
+            mostrarEstado(
+                "La salida existe y es P2WPKH, pero ya está gastada. No puede utilizarse.",
+                "error"
+            );
+            return;
+        }
+
+        if (gasto.spent !== false) {
+            throw new Error(
+                "mempool.space no ha devuelto un estado de gasto concluyente para este output."
+            );
+        }
+
+        mostrarSalida(tx, txid, vout, salida);
+
+        mostrarEstado(
+            "UTXO encontrado y no gastado. Está disponible para el siguiente paso.",
+            "ok"
+        );
+
+    } catch (error) {
+        console.error(error);
+        ocultarResultados();
+        mostrarEstado(error.message || "Se ha producido un error.", "error");
+    } finally {
+        boton.disabled = false;
+    }
+}
+
+document.getElementById("txid").addEventListener("input", function () {
+    this.value = this.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 64);
+});
+
+document.getElementById("txid").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") consultarUTXO();
+});
+
+document.getElementById("vout").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") consultarUTXO();
+});
+</script>
+
+</body>
+</html>
