@@ -10,8 +10,6 @@ En el mundo Bitcoin, la seguridad es lo primero. Esta herramienta ha sido diseñ
 *   **Sin Servidor (No Backend):** Este proyecto no envía tus datos, entropía o claves generadas a ningún servidor externo. No hay bases de datos ni APIs ocultas.
 *   **Código Auditable:** Al no utilizar herramientas de empaquetado (como Webpack o Vite) ni librerías de terceros (npm), cualquiera puede revisar las líneas de código de los archivos `.js` para verificar que no existen puertas traseras.
 *   **Tag de CSP en el HTML** (Respaldo Local)
-*   **Mecanismo de Destrucción de Memoria** (Wipe)
-*   **No autocompletado:** solucionado fuga de Datos por caché de entrada
 
 ## 🔌 Uso Seguro en Modo Offline (Recomendado)
 
