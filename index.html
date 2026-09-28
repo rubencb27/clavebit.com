@@ -1,12 +1,13 @@
 <!--
   Copyright (c) 2026 clavebit.com
   Licensed under the MIT License.
-  Open Source: https://github.com
+  Open Source: https://github.com/rubencb27/clavebit.com
   
   EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO.
 --><!DOCTYPE html>
 <html lang="es">
 <head>
+<meta charset="utf-8">
     <title>Clave privada y dirección pública para Bitcoin.</title>
 	
 	 <!-- UN UNICO CSP CONSOLIDADO Y CORREGIDO -->
@@ -187,9 +188,13 @@
 
     <div class="header-proyecto">
 	 <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/billeterahd.html" rel="noopener" style="text-decoration: none;color: orange;">Billetera HD (BIP39/BIP84)</a></p>
-        <h1 class="main-titulo">Clave privada y dirección pública para Bitcoin</h1>
+                  <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/radar.html" rel="noopener" style="text-decoration: none;color: orange;">Consolidación de UTXOs</a></p>
+                  <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/rbf.html" rel="noopener" style="text-decoration: none;color: orange;">Rescatar transacción</a></p>
+ <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/transaccion.html" rel="noopener" style="text-decoration: none;color: orange;">Generar transacción</a></p>
+
+<h1 class="main-titulo">Clave privada y dirección pública para Bitcoin</h1>
         <p class="main-descripcion">Generar una billetera de papel gratuita de Bitcoin con la clave privada para gastar y la dirección pública para recibir. <a href="./instrucciones.pdf" download style="text-decoration: none; color: red;"><b>Instrucciones</b></a> de uso y seguridad</p>
-    </div>
+</div>
 
     <div class="grid-botones">
         <button onclick="ejecutarGeneradorBitcoin()" style="background: #f7931a; color: white;">
@@ -295,7 +300,7 @@
     <div class="paso-seccion p7">
         <span class="paso-tag">PASO 7: IDENTIFICADOR DE DESTINO</span>
         <h4 class="paso-titulo">Dirección Native SegWit (Bech32 - P2WPKH - BIP 173)</h4>
-        <p class="paso-descripcion">Calculamos el Checksum: agrupamos el hash160 (20 bytes = 160 bits) en grupos de 5 bits (base 32) y obtenemos 32 valores con rangos de 0 a 31. Añadimos el prefijo 0 para indicar Native SegWit P2WPKH (versión 0) y ahora tenemos 33 valores. El prefijo bc entra en juego: se divide el valor ASCII de cada letra (b=98, c=99) en sus 3 bits superiores y 5 bits inferiores resultando con el separador intermedio 0 el vector [3, 3, 0, 2, 3]. Añadimos como prefijo estos 5 valores a los 33 que teníamos y resultan 38 valores. Además añadimos seis ceros al final (espacio reservado para el checksum) resultando 44 valores en base 32. La función matemática Polymod BCH procesa esta lista mediante una división polinómica usando un polinomio generador específico y obtenemos un número entero de 30 bits al que le aplicamos un XOR con la constante 0x3fffffff dándonos el residuo polinomial final de 30 bits, lo agrupamos en 6 bloques independientes de 5 bits cada uno y convertimos a base 32 dándonos el resultado el Checksum (6 valores en base 32).</p> 
+        <p class="paso-descripcion">Calculamos el Checksum: agrupamos el hash160 (20 bytes = 160 bits) en grupos de 5 bits (base 32) y obtenemos 32 valores con rangos de 0 a 31. Añadimos el prefijo 0 para indicar Native SegWit P2WPKH (versión 0) y ahora tenemos 33 valores. El prefijo bc entra en juego: se divide el valor ASCII de cada letra (b=98, c=99) en sus 3 bits superiores y 5 bits inferiores resultando con el separador intermedio 0 el vector [3, 3, 0, 2, 3]. Añadimos como prefijo estos 5 valores a los 33 que teníamos y resultan 38 valores. Además añadimos seis ceros al final (espacio reservado para el checksum) resultando 44 valores en base 32. La función matemática Polymod BCH procesa esta lista mediante una división polinómica usando un polinomio generador específico y obtenemos un número entero de 30 bits al que le aplicamos un XOR con la constante 1 (la constante de Bech32, BIP 173), dándonos el residuo polinomial final de 30 bits, lo agrupamos en 6 bloques independientes de 5 bits cada uno y convertimos a base 32 dándonos el resultado el Checksum (6 valores en base 32).</p> 
         
         <p class="paso-descripcion">Transformamos los 39 valores en base 32 (33 iniciales + checksum) a texto utilizando la tabla de sustitución oficial de caracteres de Bitcoin [BIP 173] Alfabeto Bech32 siendo el primer valor 0 => q (versión de testigo) y ponemos como prefijo bc1 (42 caracteres).</p>
         
@@ -834,8 +839,8 @@ function mostrarResumenCartera() {
 <footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
     <p>
         © 2026 <strong>clavebit.com</strong> | 
-        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
-        <a href="https://github.com/rubencb27/clavebit" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit.com/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit.com" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
      | Cero analíticas, cero rastreo, privacidad absoluta
 	
 	</p>
