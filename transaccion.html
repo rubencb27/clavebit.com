@@ -8,7 +8,7 @@
 <link rel="icon" href="./favicon.ico" type="image/x-icon">
 <link rel="canonical" href="https://clavebit.com/transaccion.html">
 <meta http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://mempool.space; object-src 'none'; img-src 'self' data:;">
+      content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://mempool.space; object-src 'none'; img-src 'self' data:; base-uri 'none'; form-action 'none';">
 <style>
 
         .crypto-generator-container {
@@ -184,6 +184,11 @@
             border-color: #f7931a;
             box-shadow: 0 0 0 3px rgba(247,147,26,.12);
         }
+        .campo input:read-only {
+            background: #f1f5f9;
+            color: #475569;
+            cursor: not-allowed;
+        }
         .btn-principal {
             border: none;
             padding: 13px 16px;
@@ -222,6 +227,63 @@
             font-family: 'SFMono-Regular', Consolas, monospace;
             word-break: break-all;
             color: #0f172a;
+        }
+        .btn-tarifa-opcion {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 11px 13px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            transition: border-color .15s, background .15s;
+        }
+        .btn-tarifa-opcion:hover {
+            border-color: #f7931a;
+        }
+        .btn-tarifa-opcion strong {
+            display: block;
+            color: #64748b;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: 5px;
+        }
+        .btn-tarifa-opcion code {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            color: #0f172a;
+        }
+        .btn-tarifa-opcion.seleccionada {
+            border-color: #f7931a;
+            background: #fff7ed;
+        }
+        .btn-tarifa-opcion.seleccionada strong {
+            color: #b45309;
+        }
+        .campo-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .campo-inline label {
+            margin: 0;
+            font-size: .85rem;
+            color: #334155;
+            font-weight: 600;
+        }
+        .campo-inline input[type="checkbox"] {
+            width: auto;
+            accent-color: #f7931a;
+        }
+        .campo-inline input[type="number"] {
+            width: 80px;
+            padding: 8px 10px;
+        }
+        .campo-inline .unidad {
+            color: #94a3b8;
+            font-size: .82rem;
         }
         .estado {
             margin-top: 12px;
@@ -264,6 +326,65 @@
             word-break: break-all;
         }
 
+
+        .info-output {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            line-height: 1.5;
+        }
+
+        .output-diagrama {
+            margin-top: 14px;
+            padding: 18px 20px;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #f8fafc;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.92rem;
+            line-height: 2;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            overflow-x: auto;
+        }
+        .output-diagrama .dg-root {
+            color: #f8fafc;
+            font-weight: 800;
+            letter-spacing: .03em;
+        }
+        .output-diagrama .dg-branch {
+            color: #475569;
+        }
+        .output-diagrama .dg-label {
+            color: #7dd3fc;
+            font-weight: 700;
+        }
+        .output-diagrama .dg-sublabel {
+            color: #93c5fd;
+        }
+        .output-diagrama .dg-hex {
+            display: inline-block;
+            background: #1e293b;
+            color: #fbbf24;
+            padding: 1px 7px;
+            border-radius: 5px;
+            font-weight: 700;
+        }
+        .output-diagrama .dg-value {
+            display: inline-block;
+            background: #1e293b;
+            color: #4ade80;
+            padding: 1px 7px;
+            border-radius: 5px;
+            font-weight: 700;
+        }
+        .output-diagrama .dg-arrow {
+            color: #64748b;
+        }
+
 </style>
 </head>
 <body>
@@ -304,6 +425,10 @@
             Primero debemos elegir una salida no gastada (UTXO) de una transacción anterior.
             Para identificarla necesitamos su TXID y el índice de salida (<b>vout</b>).
         </p>
+        <p class="paso-descripcion">
+            El TXID y la dirección de destino se enviarán a mempool.space para verificarlos, lo que
+            asocia tu IP con ambos datos. Para más privacidad, usa Tor Browser.
+        </p>
 
         <div class="transaction-form">
             <div class="campo">
@@ -332,7 +457,7 @@
         <div id="estado-gastado" style="display:none;"></div>
     </div>
 
-    <div id="resultado" class="paso-seccion p2" style="display:none;">
+    <div id="resultado" class="paso-seccion p1" style="display:none;">
         <span class="paso-tag">UTXO DISPONIBLE</span>
         <h4 class="paso-titulo">Datos de la salida que vamos a gastar</h4>
         <p class="paso-descripcion">
@@ -373,7 +498,7 @@
         </div>
     </div>
 
-    <div id="gastado" class="paso-seccion p2" style="display:none;">
+    <div id="gastado" class="paso-seccion p1" style="display:none;">
         <span class="paso-tag">UTXO NO DISPONIBLE</span>
         <h4 class="paso-titulo">Esta salida ya ha sido gastada</h4>
         <p class="paso-descripcion">
@@ -389,7 +514,7 @@
         </div>
     </div>
 
-    <div id="explicacion" class="paso-seccion p3" style="display:none;">
+    <div id="explicacion" class="paso-seccion p1" style="display:none;">
         <span class="paso-tag">¿QUÉ ACABAMOS DE SELECCIONAR?</span>
         <h4 class="paso-titulo">De output anterior a input nuevo</h4>
         <p class="paso-descripcion">
@@ -421,14 +546,412 @@ NUEVA TRANSACCIÓN
         </p>
     </div>
 
+
+    <!-- PASO 2 -->
+    <div id="paso2" class="paso-seccion p2" style="display:none;">
+        <span class="paso-tag">PASO 2: CREAR OUTPUT</span>
+        <h4 class="paso-titulo">Crear la salida de nuestra nueva transacción</h4>
+        <p class="paso-descripcion">
+            Ahora indicamos a qué dirección <b>bc1q</b> queremos enviar los satoshis
+            y qué cantidad queremos enviar. ClaveBit convertirá localmente la dirección
+            Bech32 en su <b>witness program</b> y construirá el <b>scriptPubKey</b> del output.
+        </p>
+
+        <div class="transaction-form">
+            <div class="campo">
+                <label for="destino">Dirección Bitcoin de destino</label>
+                <small>Solo se aceptan direcciones mainnet P2WPKH (bc1q).</small>
+                <input id="destino" type="text" maxlength="62" autocomplete="off"
+                       spellcheck="false" placeholder="bc1q...">
+            </div>
+
+            <div class="campo">
+                <label for="cantidad">Cantidad a enviar (sats)</label>
+                <small>La comisión y el cambio se calcularán en pasos posteriores.</small>
+                <input id="cantidad" type="number" min="1" step="1" inputmode="numeric"
+                       placeholder="Ejemplo: 50000">
+            </div>
+
+            <button id="btn-crear-output" class="btn-principal" type="button" onclick="crearOutput()">
+                Crear output
+            </button>
+        </div>
+
+        <div id="estado-output" class="estado" aria-live="polite">
+            Primero debes tener un UTXO disponible en el paso 1.
+        </div>
+
+        <div id="resultado-output" style="display:none;">
+            <div class="resultado-grid" style="margin-top:14px;">
+                <div class="dato"><strong>Dirección destino</strong><code id="output-address"></code></div>
+                <div class="dato"><strong>Valor</strong><code id="output-value"></code></div>
+                <div class="dato"><strong>Tipo</strong><code id="output-type"></code></div>
+                <div class="dato"><strong>Versión witness</strong><code id="output-version"></code></div>
+                <div class="dato"><strong>Witness program</strong><code id="output-program"></code></div>
+                <div class="dato"><strong>ScriptPubKey</strong><code id="output-script"></code></div>
+            </div>
+
+            <div class="info-output">
+                <b>¿Qué estamos construyendo?</b><br>
+                La transacción no guarda la dirección <b>bc1q...</b> como texto.
+                Guarda el valor y un <b>scriptPubKey</b>. En P2WPKH es
+                <b>OP_0 + PUSH_20 + witness program</b>.
+            </div>
+
+            <div class="output-diagrama"><span class="dg-root">OUTPUT</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">├──</span> <span class="dg-label">VALUE</span>
+<span class="dg-branch">│   └──</span> <span class="dg-value" id="output-diagrama-value">0</span> <span class="dg-sublabel">sats</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">└──</span> <span class="dg-label">SCRIPT PUBKEY</span>
+<span class="dg-branch">    ├──</span> <span class="dg-sublabel">OP_0</span>       <span class="dg-arrow">→</span> <span class="dg-hex">00</span>
+<span class="dg-branch">    ├──</span> <span class="dg-sublabel">PUSH_20</span>    <span class="dg-arrow">→</span> <span class="dg-hex">14</span>
+<span class="dg-branch">    └──</span> <span class="dg-sublabel">WITNESS PROGRAM</span>
+<span class="dg-branch">        └──</span> <span class="dg-hex" id="output-diagrama-program"></span></div>
+
+            <p class="paso-descripcion" style="margin-top:12px;">
+                Este output representa lo que queremos que reciba la dirección destino.
+                Todavía no hemos calculado la comisión ni el cambio.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- PASO 3 -->
+    <div id="paso3" class="paso-seccion p3" style="display:none;">
+        <span class="paso-tag">PASO 3: CREAR INPUT · RBF</span>
+
+        <h4 class="paso-titulo">Crear el input de nuestra nueva transacción</h4>
+
+        <p class="paso-descripcion">
+            El input indica qué UTXO anterior vamos a gastar.
+            ClaveBit utiliza automáticamente el TXID y el vout obtenidos
+            en el paso 1. Esta transacción se construirá con
+            <b>RBF activado</b>, para poder reemplazarla posteriormente
+            por otra con una comisión mayor si fuera necesario.
+        </p>
+
+        <div class="resultado-grid">
+
+            <div class="dato">
+                <strong>TXID anterior</strong>
+                <code id="input-txid"></code>
+            </div>
+
+            <div class="dato">
+                <strong>Vout</strong>
+                <code id="input-vout"></code>
+            </div>
+
+            <div class="dato">
+                <strong>ScriptSig</strong>
+                <code id="input-scriptsig"></code>
+            </div>
+
+            <div class="dato">
+                <strong>Sequence</strong>
+                <code id="input-sequence"></code>
+            </div>
+
+            <div class="dato">
+                <strong>RBF</strong>
+                <code id="input-rbf">Activado</code>
+            </div>
+
+        </div>
+
+        <div class="info-output">
+            <b>¿Qué estamos construyendo?</b><br><br>
+
+            El input no contiene la dirección <b>bc1q...</b>.
+            Contiene una referencia al output anterior mediante
+            <b>TXID + vout</b>.
+            <br><br>
+
+            En P2WPKH, el <b>scriptSig</b> del input permanece vacío.
+            La firma se añadirá posteriormente en el <b>witness</b>.
+            <br><br>
+
+            <b>RBF:</b> usamos un <b>sequence</b> inferior a
+            <b>0xfffffffe</b> para señalizar que esta transacción
+            puede ser reemplazada posteriormente.
+        </div>
+
+        <div class="output-diagrama">
+<span class="dg-root">INPUT #0</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">├──</span> <span class="dg-label">TXID</span>
+<span class="dg-branch">│   └──</span> <span class="dg-value" id="input-diagrama-txid"></span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">├──</span> <span class="dg-label">VOUT</span>
+<span class="dg-branch">│   └──</span> <span class="dg-value" id="input-diagrama-vout"></span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">├──</span> <span class="dg-label">SCRIPTSIG</span>
+<span class="dg-branch">│   └──</span> <span class="dg-value">vacío</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">└──</span> <span class="dg-label">SEQUENCE</span>
+    <span class="dg-branch">└──</span> <span class="dg-hex">fdffffff</span>
+    </div>
+
+        <div class="disponible-box" style="margin-top:14px;">
+            <b>✓ RBF activado</b><br>
+            La transacción se construirá con <b>sequence = fdffffff</b>.
+            Esto permitirá reemplazarla posteriormente mediante RBF.
+        </div>
+
+        <p class="paso-descripcion" style="margin-top:12px;">
+            Este input todavía no está firmado. La firma y el witness
+            se añadirán en pasos posteriores.
+        </p>
+    </div>
+
+    <div id="paso4" class="paso-seccion p4" style="display:none;">
+        <span class="paso-tag">PASO 4: CALCULAR CAMBIO Y COMISIÓN</span>
+        <h4 class="paso-titulo">Comisión de red y salida de cambio</h4>
+        <p class="paso-descripcion">
+            El UTXO que gastamos vale más que la cantidad que enviamos. La diferencia
+            se reparte entre la <b>comisión</b> que cobran los mineros y una salida de
+            <b>cambio</b> (vuelta) que vuelve a una dirección tuya.
+        </p>
+
+        <div class="transaction-form">
+            <div class="campo">
+                <label for="feerate">Tarifa de red (sat/vB)</label>
+                <small>Satoshis por byte virtual (vByte) que se pagarán a los mineros.</small>
+                <input id="feerate" type="number" min="0.1" step="0.1" inputmode="decimal"
+                       placeholder="Ejemplo: 5">
+            </div>
+
+            <button id="btn-tarifa" class="btn-principal" type="button"
+                    style="background:#0284c7;" onclick="obtenerTarifaRecomendada()">
+                Consultar tarifas recomendadas (mempool.space)
+            </button>
+
+            <div id="tarifas-recomendadas" class="resultado-grid" style="grid-template-columns: repeat(3, 1fr); display:none;">
+                <button type="button" class="btn-tarifa-opcion" id="tarifa-economica" onclick="seleccionarTarifa('economica')">
+                    <strong>Económica</strong>
+                    <code id="tarifa-economica-valor">—</code>
+                </button>
+                <button type="button" class="btn-tarifa-opcion" id="tarifa-media" onclick="seleccionarTarifa('media')">
+                    <strong>Media (~30 min)</strong>
+                    <code id="tarifa-media-valor">—</code>
+                </button>
+                <button type="button" class="btn-tarifa-opcion" id="tarifa-rapida" onclick="seleccionarTarifa('rapida')">
+                    <strong>Rápida (próximo bloque)</strong>
+                    <code id="tarifa-rapida-valor">—</code>
+                </button>
+            </div>
+
+            <div class="campo-inline">
+                <input id="margen-activo" type="checkbox" onchange="alternarMargen()">
+                <label for="margen-activo">Añadir margen de seguridad</label>
+                <input id="margen-valor" type="number" min="0" step="0.1" value="1" disabled>
+                <span class="unidad">sat/vB extra, por si la red sube antes de confirmarse</span>
+            </div>
+
+            <div class="campo">
+                <label for="cambio-direccion">Dirección de cambio (vuelta)</label>
+                <small>Dirección bc1q propia donde recibirás el sobrante. No tiene que ser la misma que gastamos.</small>
+                <input id="cambio-direccion" type="text" maxlength="42" autocomplete="off"
+                       spellcheck="false" placeholder="bc1q...">
+            </div>
+
+            <button id="btn-calcular-cambio" class="btn-principal" type="button" onclick="calcularCambio()">
+                Calcular comisión y cambio
+            </button>
+        </div>
+
+        <div id="estado-cambio" class="estado" aria-live="polite">
+            Indica la tarifa de red y la dirección de cambio para continuar.
+        </div>
+
+        <div id="resultado-cambio" class="resultado-grid" style="margin-top:14px; display:none;">
+            <div class="dato">
+                <strong>Valor del UTXO</strong>
+                <code id="cambio-utxo"></code>
+            </div>
+            <div class="dato">
+                <strong>Valor enviado</strong>
+                <code id="cambio-enviado"></code>
+            </div>
+            <div class="dato">
+                <strong>Tamaño estimado</strong>
+                <code id="cambio-vsize"></code>
+            </div>
+            <div class="dato">
+                <strong>Comisión</strong>
+                <code id="cambio-fee"></code>
+            </div>
+            <div class="dato">
+                <strong>Cambio (vuelta)</strong>
+                <code id="cambio-valor"></code>
+            </div>
+            <div class="dato">
+                <strong>Dirección de cambio</strong>
+                <code id="cambio-addr"></code>
+            </div>
+        </div>
+
+        <div id="info-sin-cambio" class="info-output" style="display:none;">
+            El sobrante es inferior al límite de "polvo" (<b>dust</b>, 294 sats) para crear
+            una salida P2WPKH, así que no se genera salida de cambio: todo el sobrante pasa
+            a formar parte de la comisión.
+        </div>
+
+        <div id="cambio-diagrama" class="output-diagrama" style="display:none;"></div>
+
+        <p class="paso-descripcion" style="margin-top:12px;">
+            El tamaño se estima para 1 input P2WPKH firmado (≈68 vB) más el overhead
+            de la transacción (≈10,5 vB) y 1 o 2 salidas P2WPKH (≈31 vB cada una),
+            siguiendo la fórmula estándar de tamaño virtual (vsize) de Bitcoin.
+        </p>
+    </div>
+
+    <div id="paso5" class="paso-seccion p5" style="display:none;">
+        <span class="paso-tag">PASO 5: SERIALIZAR TRANSACCIÓN (SIN FIRMAR)</span>
+        <h4 class="paso-titulo">Construir el hexadecimal de la transacción</h4>
+        <p class="paso-descripcion">
+            Con el input y los outputs ya definidos, se puede construir la transacción
+            completa en formato binario (hexadecimal): versión, lista de inputs, lista
+            de outputs y locktime. El <code>scriptSig</code> del input todavía va vacío
+            porque esta transacción <b>aún no está firmada</b> — eso se hará en el
+            siguiente paso, añadiendo el witness.
+        </p>
+
+        <div class="transaction-form">
+            <button class="btn-principal" type="button" onclick="serializarTransaccion()">
+                Construir transacción sin firmar
+            </button>
+        </div>
+
+        <div id="estado-serializar" class="estado" aria-live="polite">
+            Pulsa el botón para construir el hexadecimal de la transacción.
+        </div>
+
+        <div id="resultado-serializar" style="display:none; margin-top:14px;">
+            <div class="dato" style="margin-bottom:10px;">
+                <strong>Transacción sin firmar (hex)</strong>
+                <code id="tx-raw-hex" style="display:block; word-break: break-all;"></code>
+            </div>
+
+            <div class="resultado-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="dato">
+                    <strong>Tamaño base</strong>
+                    <code id="tx-raw-bytes"></code>
+                </div>
+                <div class="dato">
+                    <strong>Inputs</strong>
+                    <code id="tx-raw-inputs"></code>
+                </div>
+                <div class="dato">
+                    <strong>Outputs</strong>
+                    <code id="tx-raw-outputs"></code>
+                </div>
+            </div>
+        </div>
+
+        <div id="tx-raw-diagrama" class="output-diagrama" style="display:none;"></div>
+
+        <p class="paso-descripcion" style="margin-top:12px;">
+            Formato: versión (4 B, little-endian) · nº de inputs (compactSize) ·
+            por cada input: txid invertido (32 B) + vout (4 B LE) + longitud de
+            scriptSig (0x00) + sequence (4 B) · nº de outputs (compactSize) ·
+            por cada output: valor en sats (8 B LE) + longitud de scriptPubKey +
+            scriptPubKey · locktime (4 B).
+        </p>
+    </div>
+
+    <div id="paso6" class="paso-seccion p6" style="display:none;">
+        <span class="paso-tag">PASO 6: CALCULAR EL SIGHASH (BIP143)</span>
+        <h4 class="paso-titulo">El mensaje que se va a firmar</h4>
+        <p class="paso-descripcion">
+            En una transacción SegWit no se firma el hexadecimal completo, sino un
+            <b>resumen</b> (sighash) definido en el BIP143. Este resumen compromete
+            los inputs, los outputs, el <b>valor del UTXO que se gasta</b> y el
+            <code>scriptCode</code>, de modo que la firma no puede reutilizarse para
+            otra transacción. Aquí calculamos ese resumen con
+            <code>SIGHASH_ALL</code>; en el siguiente paso se firmará con la clave privada.
+        </p>
+
+        <div class="transaction-form">
+            <button class="btn-principal" type="button" onclick="calcularSighash()">
+                Calcular sighash
+            </button>
+        </div>
+
+        <div id="estado-sighash" class="estado" aria-live="polite">
+            Pulsa el botón para calcular el mensaje a firmar.
+        </div>
+
+        <div id="resultado-sighash" style="display:none; margin-top:14px;">
+            <div class="dato" style="margin-bottom:10px;">
+                <strong>Sighash (SHA256d del preimage) — lo que se firma</strong>
+                <code id="sighash-final" style="display:block; word-break: break-all;"></code>
+            </div>
+            <div class="dato" style="margin-bottom:10px;">
+                <strong>Preimage BIP143 (hex)</strong>
+                <code id="sighash-preimage" style="display:block; word-break: break-all;"></code>
+            </div>
+        </div>
+
+        <div id="sighash-diagrama" class="output-diagrama" style="display:none;"></div>
+
+        <p class="paso-descripcion" style="margin-top:12px;">
+            Preimage: versión (4 B) · hashPrevouts · hashSequence · outpoint (txid
+            invertido + vout) · scriptCode · valor del UTXO (8 B LE) · sequence ·
+            hashOutputs · locktime · tipo de sighash (<code>01000000</code>). Los tres
+            hashes son SHA-256 doble, y el sighash final también.
+        </p>
+    </div>
+
+    <div id="paso7" class="paso-seccion p7" style="display:none;">
+        <span class="paso-tag">PASO 7: FIRMAR Y CONSTRUIR EL WITNESS</span>
+        <h4 class="paso-titulo">Firmar el sighash con la clave privada</h4>
+        <p class="paso-descripcion">
+            Se firma el sighash con ECDSA (secp256k1, nonce determinista RFC 6979, <code>s</code> bajo),
+            se codifica la firma en DER + <code>01</code> (SIGHASH_ALL) y se construye el
+            <b>witness</b> <code>[firma, clave pública]</code>. La clave privada se usa solo en tu
+            navegador y no se envía ni se guarda. Esta web es educativa: con importes relevantes,
+            firma con tu cartera habitual o un dispositivo offline.
+        </p>
+        <div class="transaction-form">
+            <div class="campo">
+                <label for="clave-privada">Clave privada (hex, 64 caracteres)</label>
+                <input id="clave-privada" type="password" maxlength="64" autocomplete="off"
+                       spellcheck="false" placeholder="64 caracteres hexadecimales">
+            </div>
+            <button class="btn-principal" type="button" onclick="firmarTransaccion()">Firmar transacción</button>
+        </div>
+        <div id="estado-firma" class="estado" aria-live="polite">Introduce la clave privada del UTXO que estás gastando.</div>
+        <div id="resultado-firma" style="display:none; margin-top:14px;">
+            <div class="dato" style="margin-bottom:10px;"><strong>Firma DER + SIGHASH_ALL</strong>
+                <code id="firma-der" style="display:block; word-break: break-all;"></code></div>
+            <div class="dato" style="margin-bottom:10px;"><strong>Clave pública (comprimida)</strong>
+                <code id="firma-pubkey" style="display:block; word-break: break-all;"></code></div>
+            <div class="dato" style="margin-bottom:10px;"><strong>Transacción firmada (hex)</strong>
+                <code id="tx-firmada-hex" style="display:block; word-break: break-all;"></code></div>
+            <button class="btn-principal" type="button" onclick="copiarTxFirmada()">Copiar hex</button>
+            <div class="resultado-grid" style="grid-template-columns: repeat(2, 1fr); margin-top:12px;">
+                <div class="dato"><strong>TXID</strong><code id="firma-txid" style="word-break: break-all;"></code></div>
+                <div class="dato"><strong>WTXID</strong><code id="firma-wtxid" style="word-break: break-all;"></code></div>
+                <div class="dato"><strong>Tamaño / peso / vsize</strong><code id="firma-tamano"></code></div>
+                <div class="dato"><strong>Comisión y tarifa efectiva</strong><code id="firma-tarifa"></code></div>
+            </div>
+            <div class="info-output">
+                Esta web no emite la transacción. Copia el hex y difúndelo tú mismo
+                (mempool.space, Blockstream o tu propio nodo).
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
     <p>
         © 2026 <strong>clavebit.com</strong> | 
-        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
-        <a href="https://github.com/rubencb27/clavebit" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
-     | Cero analíticas, cero rastreo, privacidad absoluta
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit.com/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit.com" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
+     | Cero analíticas y cero rastreo. No se envía la clave privada; se consultan el TXID y el estado del UTXO en mempool.space
 	</p>
 	
 	<p>
@@ -454,6 +977,10 @@ NUEVA TRANSACCIÓN
 <script>
 const API_BASE = "https://mempool.space/api";
 
+// Evita que, tras verificar un UTXO, se pueda cambiar el TXID/vout "por
+// detrás" sin volver a verificarlo contra mempool.space.
+let utxoBloqueado = false;
+
 function mostrarEstado(texto, tipo = "") {
     const el = document.getElementById("estado");
     el.textContent = texto;
@@ -461,9 +988,19 @@ function mostrarEstado(texto, tipo = "") {
 }
 
 function ocultarResultados() {
+    reiniciarPasos67();
     document.getElementById("resultado").style.display = "none";
     document.getElementById("gastado").style.display = "none";
     document.getElementById("explicacion").style.display = "none";
+    document.getElementById("paso2").style.display = "none";
+    document.getElementById("paso3").style.display = "none";
+    document.getElementById("paso4").style.display = "none";
+    document.getElementById("paso5").style.display = "none";
+    document.getElementById("resultado-cambio").style.display = "none";
+    document.getElementById("info-sin-cambio").style.display = "none";
+    document.getElementById("cambio-diagrama").style.display = "none";
+    document.getElementById("resultado-serializar").style.display = "none";
+    document.getElementById("tx-raw-diagrama").style.display = "none";
 }
 
 function esTxidValido(txid) {
@@ -485,6 +1022,8 @@ function limpiarHashHex(valor) {
 function mostrarSalida(tx, txid, vout, salida) {
     const value = Number(salida.value);
 
+    document.getElementById("resultado").dataset.value = value;
+
     document.getElementById("out-txid").textContent = txid;
     document.getElementById("out-vout").textContent = vout;
     document.getElementById("out-value").textContent =
@@ -504,7 +1043,24 @@ function mostrarSalida(tx, txid, vout, salida) {
     document.getElementById("explicacion").style.display = "block";
 }
 
+function desbloquearUTXO() {
+    utxoBloqueado = false;
+    document.getElementById("txid").readOnly = false;
+    document.getElementById("vout").readOnly = false;
+    document.getElementById("btn-consultar").textContent = "Consultar UTXO";
+    ocultarResultados();
+    mostrarEstado("Introduce el TXID y el vout para consultar la salida anterior.");
+}
+
 async function consultarUTXO() {
+    // Si ya había un UTXO verificado, este clic significa "quiero elegir
+    // otro distinto": se desbloquean los campos y se invalida todo lo
+    // construido después, en vez de reutilizar un TXID/vout sin verificar.
+    if (utxoBloqueado) {
+        desbloquearUTXO();
+        return;
+    }
+
     const txid = document.getElementById("txid").value.trim().toLowerCase();
     const voutTexto = document.getElementById("vout").value.trim();
     const vout = Number(voutTexto);
@@ -609,8 +1165,19 @@ async function consultarUTXO() {
 
         mostrarSalida(tx, txid, vout, salida);
 
+        document.getElementById("paso2").style.display = "block";
+
+        // Se bloquean los campos para que el TXID/vout ya verificados no
+        // puedan cambiarse "por detrás" sin volver a pasar por esta
+        // comprobación (existencia, P2WPKH, no gastado).
+        utxoBloqueado = true;
+        document.getElementById("txid").readOnly = true;
+        document.getElementById("vout").readOnly = true;
+        boton.textContent = "Cambiar UTXO";
+
         mostrarEstado(
-            "UTXO encontrado y no gastado. Está disponible para el siguiente paso.",
+            "UTXO encontrado y no gastado. Está disponible para el siguiente paso. " +
+            "Los campos se han bloqueado; usa \"Cambiar UTXO\" para elegir otro.",
             "ok"
         );
 
@@ -623,12 +1190,954 @@ async function consultarUTXO() {
     }
 }
 
+
+const BECH32_CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+
+function bech32Polymod(values) {
+    const generators = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
+    let chk = 1;
+
+    for (const value of values) {
+        const top = chk >>> 25;
+        chk = ((((chk & 0x1ffffff) << 5) >>> 0) ^ value) >>> 0;
+        for (let i = 0; i < 5; i++) {
+            if ((top >>> i) & 1) chk = (chk ^ generators[i]) >>> 0;
+        }
+    }
+    return chk >>> 0;
+}
+
+function bech32HrpExpand(hrp) {
+    const result = [];
+    for (const char of hrp) result.push(char.charCodeAt(0) >> 5);
+    result.push(0);
+    for (const char of hrp) result.push(char.charCodeAt(0) & 31);
+    return result;
+}
+
+function convertirBits(data, fromBits, toBits, pad) {
+    let acc = 0;
+    let bits = 0;
+    const ret = [];
+    const maxv = (1 << toBits) - 1;
+    const maxAcc = (1 << (fromBits + toBits - 1)) - 1;
+
+    for (const value of data) {
+        if (value < 0 || (value >> fromBits) !== 0) {
+            throw new Error("Datos Bech32 inválidos.");
+        }
+        acc = ((acc << fromBits) | value) & maxAcc;
+        bits += fromBits;
+
+        while (bits >= toBits) {
+            bits -= toBits;
+            ret.push((acc >> bits) & maxv);
+        }
+    }
+
+    if (pad) {
+        if (bits > 0) ret.push((acc << (toBits - bits)) & maxv);
+    } else {
+        if (bits >= fromBits || ((acc << (toBits - bits)) & maxv) !== 0) {
+            throw new Error("Padding Bech32 inválido.");
+        }
+    }
+    return ret;
+}
+
+function bech32DecodificarDireccion(direccion) {
+    const texto = direccion.trim();
+
+    if (texto !== texto.toLowerCase()) {
+        throw new Error("La dirección debe estar escrita en minúsculas.");
+    }
+    if (!texto.startsWith("bc1")) {
+        throw new Error("La dirección debe ser mainnet y comenzar por bc1.");
+    }
+
+    const pos = texto.lastIndexOf("1");
+    if (pos < 1 || pos + 7 > texto.length) {
+        throw new Error("Dirección Bech32 no válida.");
+    }
+
+    const hrp = texto.slice(0, pos);
+    const parteDatos = texto.slice(pos + 1);
+    const data = [];
+
+    for (const char of parteDatos) {
+        const indice = BECH32_CHARSET.indexOf(char);
+        if (indice === -1) throw new Error("La dirección contiene un carácter no válido.");
+        data.push(indice);
+    }
+
+    if (bech32Polymod(bech32HrpExpand(hrp).concat(data)) !== 1) {
+        throw new Error("Checksum Bech32 incorrecto.");
+    }
+
+    const payload = data.slice(0, -6);
+    if (payload.length < 1 || payload[0] !== 0) {
+        throw new Error("Solo se admite witness version 0.");
+    }
+
+    const programa = convertirBits(payload.slice(1), 5, 8, false);
+    if (programa.length !== 20) {
+        throw new Error("No es P2WPKH: el witness program debe tener 20 bytes.");
+    }
+
+    return {
+        version: 0,
+        programHex: programa.map(b => b.toString(16).padStart(2, "0")).join("")
+    };
+}
+
+function mostrarEstadoOutput(texto, tipo = "") {
+    const el = document.getElementById("estado-output");
+    el.textContent = texto;
+    el.className = "estado" + (tipo ? " " + tipo : "");
+}
+
+function crearOutput() {
+    reiniciarPasos67();
+    const destino = document.getElementById("destino").value.trim();
+    const cantidadTexto = document.getElementById("cantidad").value.trim();
+    const cantidad = Number(cantidadTexto);
+
+    document.getElementById("resultado-output").style.display = "none";
+
+    if (document.getElementById("resultado").style.display !== "block") {
+        mostrarEstadoOutput("Primero debes consultar un UTXO disponible en el paso 1.", "error");
+        return;
+    }
+
+    if (!/^bc1q[0-9ac-hj-np-z]{38}$/.test(destino)) {
+        mostrarEstadoOutput("La dirección debe ser una bc1q mainnet válida de 42 caracteres.", "error");
+        return;
+    }
+
+    if (cantidadTexto === "" || !Number.isSafeInteger(cantidad) || cantidad <= 0) {
+        mostrarEstadoOutput("La cantidad debe ser un número entero positivo de satoshis.", "error");
+        return;
+    }
+
+    if (cantidad < DUST_LIMIT_SATS) {
+        mostrarEstadoOutput(`La cantidad es inferior al límite de polvo (${DUST_LIMIT_SATS} sats): los nodos rechazarían la transacción.`, "error");
+        return;
+    }
+
+    try {
+        const datos = bech32DecodificarDireccion(destino);
+        const scriptPubKey = "0014" + datos.programHex;
+
+        document.getElementById("resultado-output").dataset.value = cantidad;
+
+        document.getElementById("output-address").textContent = destino;
+        document.getElementById("output-value").textContent = `${cantidad.toLocaleString("es-ES")} sats`;
+        document.getElementById("output-type").textContent = "P2WPKH (SegWit nativo)";
+        document.getElementById("output-version").textContent = "0";
+        document.getElementById("output-program").textContent = datos.programHex;
+        document.getElementById("output-script").textContent = scriptPubKey;
+        document.getElementById("output-diagrama-value").textContent = cantidad.toLocaleString("es-ES");
+        document.getElementById("output-diagrama-program").textContent = datos.programHex;
+
+        document.getElementById("resultado-output").style.display = "block";
+
+        // El input se construye automáticamente a partir del UTXO seleccionado.
+        crearInput();
+
+        mostrarEstadoOutput(
+            "Output P2WPKH creado correctamente. La dirección y su checksum se han verificado localmente.",
+            "ok"
+        );
+    } catch (error) {
+        mostrarEstadoOutput(error.message || "No se ha podido decodificar la dirección.", "error");
+    }
+}
+
+
+function crearInput() {
+    reiniciarPasos67();
+
+    const txid = document.getElementById("txid").value.trim().toLowerCase();
+    const vout = document.getElementById("vout").value.trim();
+
+    if (!esTxidValido(txid)) {
+        mostrarEstadoOutput(
+            "No hay un TXID válido disponible.",
+            "error"
+        );
+        return;
+    }
+
+    if (vout === "" || !/^\d+$/.test(vout)) {
+        mostrarEstadoOutput(
+            "No hay un vout válido disponible.",
+            "error"
+        );
+        return;
+    }
+
+    // Datos del input.
+    document.getElementById("input-txid").textContent = txid;
+    document.getElementById("input-vout").textContent = vout;
+
+    // P2WPKH: el scriptSig del input es vacío.
+    document.getElementById("input-scriptsig").textContent = "vacío";
+
+    // RBF activado.
+    // fdffffff es menor que fffffffe y señaliza reemplazabilidad.
+    const sequenceRBF = "fdffffff";
+
+    document.getElementById("input-sequence").textContent = sequenceRBF;
+
+    // Diagrama.
+    document.getElementById("input-diagrama-txid").textContent = txid;
+    document.getElementById("input-diagrama-vout").textContent = vout;
+
+    // Mostrar paso 3.
+    document.getElementById("paso3").style.display = "block";
+    document.getElementById("paso4").style.display = "block";
+
+    mostrarEstadoOutput(
+        "Output creado e input RBF creado correctamente.",
+        "ok"
+    );
+}
+
+
+// --- PASO 4: comisión y cambio ---------------------------------------
+
+const DUST_LIMIT_SATS = 294; // Límite de "polvo" de Bitcoin Core para una salida P2WPKH (a 3 sat/vB).
+
+// Tamaños virtuales aproximados (vBytes) de una transacción P2WPKH estándar,
+// según la fórmula habitual: overhead + 68 vB por input + 31 vB por output.
+const TX_OVERHEAD_VB = 10.5;
+const TX_INPUT_VB = 68;
+const TX_OUTPUT_VB = 31;
+
+function mostrarEstadoCambio(texto, tipo = "") {
+    const el = document.getElementById("estado-cambio");
+    el.textContent = texto;
+    el.className = "estado" + (tipo ? " " + tipo : "");
+}
+
+let tarifasRecomendadas = null;
+
+async function obtenerTarifaRecomendada() {
+    const boton = document.getElementById("btn-tarifa");
+    boton.disabled = true;
+    mostrarEstadoCambio("Consultando las tarifas recomendadas en mempool.space...");
+
+    try {
+        const respuesta = await fetch(`${API_BASE}/v1/fees/recommended`);
+
+        if (!respuesta.ok) {
+            if (respuesta.status === 429) {
+                throw new Error("Límite de peticiones alcanzado en mempool.space. Inténtalo de nuevo más tarde.");
+            }
+            throw new Error(`No se ha podido consultar la tarifa (HTTP ${respuesta.status}).`);
+        }
+
+        const datos = await respuesta.json();
+
+        tarifasRecomendadas = {
+            economica: datos.economyFee || datos.minimumFee,
+            media: datos.halfHourFee,
+            rapida: datos.fastestFee
+        };
+
+        if (!tarifasRecomendadas.economica && !tarifasRecomendadas.media && !tarifasRecomendadas.rapida) {
+            throw new Error("mempool.space no ha devuelto ninguna tarifa válida.");
+        }
+
+        document.getElementById("tarifa-economica-valor").textContent =
+            tarifasRecomendadas.economica ? `${tarifasRecomendadas.economica} sat/vB` : "N/D";
+        document.getElementById("tarifa-media-valor").textContent =
+            tarifasRecomendadas.media ? `${tarifasRecomendadas.media} sat/vB` : "N/D";
+        document.getElementById("tarifa-rapida-valor").textContent =
+            tarifasRecomendadas.rapida ? `${tarifasRecomendadas.rapida} sat/vB` : "N/D";
+
+        document.getElementById("tarifas-recomendadas").style.display = "grid";
+
+        // Selecciona automáticamente la tarifa media como sugerencia por defecto.
+        if (tarifasRecomendadas.media) {
+            seleccionarTarifa("media");
+        }
+
+        mostrarEstadoCambio("Tarifas recomendadas obtenidas. Elige la que prefieras.", "ok");
+
+    } catch (error) {
+        mostrarEstadoCambio(error.message || "No se ha podido obtener la tarifa recomendada.", "error");
+    } finally {
+        boton.disabled = false;
+    }
+}
+
+function seleccionarTarifa(tipo) {
+    if (!tarifasRecomendadas || !tarifasRecomendadas[tipo]) return;
+
+    document.getElementById("feerate").value = tarifasRecomendadas[tipo];
+
+    ["economica", "media", "rapida"].forEach((t) => {
+        document.getElementById(`tarifa-${t}`).classList.toggle("seleccionada", t === tipo);
+    });
+}
+
+function alternarMargen() {
+    document.getElementById("margen-valor").disabled = !document.getElementById("margen-activo").checked;
+}
+
+function calcularCambio() {
+    document.getElementById("resultado-cambio").style.display = "none";
+    document.getElementById("info-sin-cambio").style.display = "none";
+    document.getElementById("cambio-diagrama").style.display = "none";
+    document.getElementById("paso5").style.display = "none";
+    document.getElementById("resultado-serializar").style.display = "none";
+    document.getElementById("tx-raw-diagrama").style.display = "none";
+
+    if (document.getElementById("paso3").style.display !== "block") {
+        mostrarEstadoCambio("Primero debes completar el paso 3 (input creado).", "error");
+        return;
+    }
+
+    const utxoValue = Number(document.getElementById("resultado").dataset.value);
+    const outputValue = Number(document.getElementById("resultado-output").dataset.value);
+
+    if (!Number.isFinite(utxoValue) || !Number.isFinite(outputValue)) {
+        mostrarEstadoCambio(
+            "No se han encontrado los valores del UTXO y del output. Repite los pasos anteriores.",
+            "error"
+        );
+        return;
+    }
+
+    const feerateTexto = document.getElementById("feerate").value.trim();
+    const feerateBase = Number(feerateTexto);
+
+    if (feerateTexto === "" || !Number.isFinite(feerateBase) || feerateBase <= 0) {
+        mostrarEstadoCambio("Introduce una tarifa de red válida en sat/vB.", "error");
+        return;
+    }
+
+    const margenActivo = document.getElementById("margen-activo").checked;
+    const margenValorTexto = document.getElementById("margen-valor").value.trim();
+    const margenValor = Number(margenValorTexto);
+
+    if (margenActivo && (margenValorTexto === "" || !Number.isFinite(margenValor) || margenValor < 0)) {
+        mostrarEstadoCambio("El margen de seguridad debe ser un número igual o mayor que 0.", "error");
+        return;
+    }
+
+    const feerate = margenActivo ? feerateBase + margenValor : feerateBase;
+
+    const cambioDireccion = document.getElementById("cambio-direccion").value.trim();
+
+    if (!/^bc1q[0-9ac-hj-np-z]{38}$/.test(cambioDireccion)) {
+        mostrarEstadoCambio("La dirección de cambio debe ser una bc1q mainnet válida de 42 caracteres.", "error");
+        return;
+    }
+
+    let datosCambio;
+    try {
+        datosCambio = bech32DecodificarDireccion(cambioDireccion);
+    } catch (error) {
+        mostrarEstadoCambio(error.message || "No se ha podido decodificar la dirección de cambio.", "error");
+        return;
+    }
+
+    const restante = utxoValue - outputValue;
+
+    if (restante < 0) {
+        mostrarEstadoCambio("El UTXO no cubre la cantidad enviada. Fondos insuficientes.", "error");
+        return;
+    }
+
+    // Primero se calcula asumiendo que SÍ habrá salida de cambio (2 outputs).
+    const vsizeConCambio = TX_OVERHEAD_VB + TX_INPUT_VB * 1 + TX_OUTPUT_VB * 2;
+    const feeConCambio = Math.ceil(vsizeConCambio * feerate);
+    const cambioBruto = restante - feeConCambio;
+
+    let vsizeFinal, feeFinal, hayCambio, cambioFinal;
+
+    if (cambioBruto >= DUST_LIMIT_SATS) {
+        // El cambio es suficientemente grande: se crea la salida de cambio.
+        vsizeFinal = vsizeConCambio;
+        feeFinal = feeConCambio;
+        hayCambio = true;
+        cambioFinal = cambioBruto;
+    } else {
+        // El cambio sería polvo (o negativo): no se crea salida de cambio y
+        // todo el sobrante pasa a formar parte de la comisión.
+        const vsizeSinCambio = TX_OVERHEAD_VB + TX_INPUT_VB * 1 + TX_OUTPUT_VB * 1;
+        const feeMinimaSinCambio = Math.ceil(vsizeSinCambio * feerate);
+
+        if (restante < feeMinimaSinCambio) {
+            mostrarEstadoCambio(
+                `Fondos insuficientes para cubrir la comisión mínima. Se necesitan al menos ` +
+                `${feeMinimaSinCambio.toLocaleString("es-ES")} sats de comisión y solo quedan ` +
+                `${restante.toLocaleString("es-ES")} sats disponibles.`,
+                "error"
+            );
+            return;
+        }
+
+        vsizeFinal = vsizeSinCambio;
+        feeFinal = restante;
+        hayCambio = false;
+        cambioFinal = 0;
+
+        document.getElementById("info-sin-cambio").style.display = "block";
+    }
+
+    document.getElementById("cambio-utxo").textContent = `${utxoValue.toLocaleString("es-ES")} sats`;
+    document.getElementById("cambio-enviado").textContent = `${outputValue.toLocaleString("es-ES")} sats`;
+    document.getElementById("cambio-vsize").textContent = `≈ ${vsizeFinal.toFixed(1)} vB`;
+    document.getElementById("cambio-fee").textContent = margenActivo
+        ? `${feeFinal.toLocaleString("es-ES")} sats (${feerateBase} + ${margenValor} = ${feerate} sat/vB)`
+        : `${feeFinal.toLocaleString("es-ES")} sats (${feerate} sat/vB)`;
+    document.getElementById("cambio-valor").textContent = hayCambio
+        ? `${cambioFinal.toLocaleString("es-ES")} sats`
+        : "Sin salida de cambio";
+    document.getElementById("cambio-addr").textContent = hayCambio ? cambioDireccion : "—";
+
+    document.getElementById("resultado-cambio").style.display = "grid";
+
+    // Se guarda el resultado en el propio contenedor del paso, para que
+    // pasos posteriores (serialización/firma) puedan leerlo sin recalcularlo.
+    const paso4 = document.getElementById("paso4");
+    paso4.dataset.hayCambio = hayCambio ? "1" : "0";
+    paso4.dataset.cambioValor = cambioFinal;
+    paso4.dataset.cambioDireccion = hayCambio ? cambioDireccion : "";
+    paso4.dataset.cambioScript = hayCambio ? ("0014" + datosCambio.programHex) : "";
+    paso4.dataset.fee = feeFinal;
+    paso4.dataset.vsize = vsizeFinal;
+    paso4.dataset.feerate = feerate;
+    paso4.dataset.feerateBase = feerateBase;
+    paso4.dataset.margen = margenActivo ? margenValor : 0;
+
+    const diagrama = document.getElementById("cambio-diagrama");
+    let lineas = `<span class="dg-root">RESUMEN DE LA TRANSACCIÓN</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">├──</span> <span class="dg-label">INPUT</span> <span class="dg-value">${utxoValue.toLocaleString("es-ES")} sats</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">├──</span> <span class="dg-label">OUTPUT (destino)</span> <span class="dg-value">${outputValue.toLocaleString("es-ES")} sats</span>`;
+
+    if (hayCambio) {
+        lineas += `
+<span class="dg-branch">├──</span> <span class="dg-label">OUTPUT (cambio)</span> <span class="dg-value">${cambioFinal.toLocaleString("es-ES")} sats</span>`;
+    }
+
+    lineas += `
+<span class="dg-branch">│</span>
+<span class="dg-branch">└──</span> <span class="dg-label">COMISIÓN (fee)</span> <span class="dg-hex">${feeFinal.toLocaleString("es-ES")} sats</span>`;
+
+    diagrama.innerHTML = lineas;
+    diagrama.style.display = "block";
+
+    reiniciarPasos67();
+    document.getElementById("paso5").style.display = "block";
+    document.getElementById("resultado-serializar").style.display = "none";
+    document.getElementById("tx-raw-diagrama").style.display = "none";
+
+    mostrarEstadoCambio("Comisión y cambio calculados correctamente.", "ok");
+}
+
+
+// --- PASO 5: serializar transacción sin firmar ------------------------
+
+// Convierte un número entero no negativo a hex little-endian con "bytes" bytes.
+function numeroALEHex(numero, bytes) {
+    let hex = "";
+    let resto = BigInt(numero);
+    for (let i = 0; i < bytes; i++) {
+        hex += (resto & 0xffn).toString(16).padStart(2, "0");
+        resto >>= 8n;
+    }
+    return hex;
+}
+
+// Codifica un número como compactSize (varint) de Bitcoin.
+function compactSizeHex(numero) {
+    if (numero < 0xfd) {
+        return numero.toString(16).padStart(2, "0");
+    }
+    if (numero <= 0xffff) {
+        return "fd" + numeroALEHex(numero, 2);
+    }
+    if (numero <= 0xffffffff) {
+        return "fe" + numeroALEHex(numero, 4);
+    }
+    return "ff" + numeroALEHex(numero, 8);
+}
+
+// Invierte el orden de bytes de un hash hexadecimal (para el txid en el input).
+function invertirBytesHex(hex) {
+    const pares = hex.match(/.{2}/g) || [];
+    return pares.reverse().join("");
+}
+
+function serializarTransaccion() {
+    reiniciarPasos67();
+    document.getElementById("resultado-serializar").style.display = "none";
+    document.getElementById("tx-raw-diagrama").style.display = "none";
+
+    if (document.getElementById("paso4").style.display !== "block" ||
+        document.getElementById("resultado-cambio").style.display !== "grid") {
+        mostrarEstadoSerializar("Primero debes calcular la comisión y el cambio en el paso 4.", "error");
+        return;
+    }
+
+    try {
+        const txid = document.getElementById("input-txid").textContent.trim();
+        const vout = Number(document.getElementById("input-vout").textContent.trim());
+        const sequence = document.getElementById("input-sequence").textContent.trim();
+
+        const outputScript = document.getElementById("output-script").textContent.trim();
+        const outputValue = Number(document.getElementById("resultado-output").dataset.value);
+
+        const paso4 = document.getElementById("paso4");
+        const hayCambio = paso4.dataset.hayCambio === "1";
+        const cambioScript = paso4.dataset.cambioScript;
+        const cambioValor = Number(paso4.dataset.cambioValor);
+
+        if (!esTxidValido(txid) || !Number.isInteger(vout) || sequence.length !== 8) {
+            throw new Error("Los datos del input (paso 3) no son válidos. Repite los pasos anteriores.");
+        }
+
+        // --- Version ---
+        const version = numeroALEHex(1, 4);
+
+        // --- Inputs ---
+        const numInputs = compactSizeHex(1);
+        const inputHex =
+            invertirBytesHex(txid) +      // txid invertido, 32 bytes
+            numeroALEHex(vout, 4) +       // vout, 4 bytes LE
+            "00" +                        // scriptSig vacío (sin firmar todavía)
+            sequence;                     // sequence, ya en formato de 4 bytes
+
+        // --- Outputs ---
+        const outputs = [{ valor: outputValue, script: outputScript }];
+        if (hayCambio) {
+            outputs.push({ valor: cambioValor, script: cambioScript });
+        }
+
+        const numOutputs = compactSizeHex(outputs.length);
+        const outputsHex = outputs.map((salida) => {
+            const scriptLen = compactSizeHex(salida.script.length / 2);
+            return numeroALEHex(salida.valor, 8) + scriptLen + salida.script;
+        }).join("");
+
+        // --- Locktime ---
+        const locktime = numeroALEHex(0, 4);
+
+        const txHex = version + numInputs + inputHex + numOutputs + outputsHex + locktime;
+        const txBytes = txHex.length / 2;
+
+        document.getElementById("tx-raw-hex").textContent = txHex;
+        document.getElementById("tx-raw-bytes").textContent = `${txBytes} bytes`;
+        document.getElementById("tx-raw-inputs").textContent = "1 (P2WPKH, sin firmar)";
+        document.getElementById("tx-raw-outputs").textContent = hayCambio ? "2 (destino + cambio)" : "1 (destino)";
+
+        document.getElementById("resultado-serializar").style.display = "block";
+        document.getElementById("paso6").style.display = "block";
+
+        // Guardar para los pasos siguientes (firma/witness).
+        paso4.dataset.txVersion = version;
+        document.getElementById("paso5").dataset.txHexSinFirmar = txHex;
+        document.getElementById("paso5").dataset.txLocktime = locktime;
+
+        const diagrama = document.getElementById("tx-raw-diagrama");
+        let lineas = `<span class="dg-root">TRANSACCIÓN SIN FIRMAR</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">├──</span> <span class="dg-label">version</span> <span class="dg-hex">${version}</span>
+<span class="dg-branch">├──</span> <span class="dg-label">nº inputs</span> <span class="dg-hex">${numInputs}</span>
+<span class="dg-branch">├──</span> <span class="dg-label">input[0].txid (invertido)</span> <span class="dg-hex">${invertirBytesHex(txid)}</span>
+<span class="dg-branch">├──</span> <span class="dg-label">input[0].vout</span> <span class="dg-hex">${numeroALEHex(vout, 4)}</span>
+<span class="dg-branch">├──</span> <span class="dg-label">input[0].scriptSig</span> <span class="dg-hex">00 (vacío)</span>
+<span class="dg-branch">├──</span> <span class="dg-label">input[0].sequence</span> <span class="dg-hex">${sequence}</span>
+<span class="dg-branch">├──</span> <span class="dg-label">nº outputs</span> <span class="dg-hex">${numOutputs}</span>`;
+
+        outputs.forEach((salida, i) => {
+            lineas += `
+<span class="dg-branch">├──</span> <span class="dg-label">output[${i}].valor</span> <span class="dg-value">${salida.valor.toLocaleString("es-ES")} sats</span>
+<span class="dg-branch">├──</span> <span class="dg-label">output[${i}].script</span> <span class="dg-hex">${salida.script}</span>`;
+        });
+
+        lineas += `
+<span class="dg-branch">│</span>
+<span class="dg-branch">└──</span> <span class="dg-label">locktime</span> <span class="dg-hex">${locktime}</span>`;
+
+        diagrama.innerHTML = lineas;
+        diagrama.style.display = "block";
+
+        mostrarEstadoSerializar(
+            "Transacción sin firmar construida correctamente. El scriptSig sigue vacío hasta que se firme.",
+            "ok"
+        );
+    } catch (error) {
+        mostrarEstadoSerializar(error.message || "No se ha podido construir la transacción.", "error");
+    }
+}
+
+function mostrarEstadoSerializar(texto, tipo = "") {
+    const el = document.getElementById("estado-serializar");
+    el.textContent = texto;
+    el.className = "estado" + (tipo ? " " + tipo : "");
+}
+
+
+// --- Reconstrucción común de la tx sin firmar (pasos 6 y 7) -----------
+
+function reconstruirTxSinFirmar() {
+    const paso4 = document.getElementById("paso4");
+    const txid = document.getElementById("input-txid").textContent.trim();
+    const vout = Number(document.getElementById("input-vout").textContent.trim());
+    const sequence = document.getElementById("input-sequence").textContent.trim();
+    const utxoValue = Number(document.getElementById("resultado").dataset.value);
+    const utxoScript = document.getElementById("out-script").textContent.trim();
+    if (!/^0014[0-9a-f]{40}$/.test(utxoScript)) throw new Error("El UTXO del paso 1 no es P2WPKH.");
+    if (!Number.isInteger(utxoValue) || utxoValue <= 0) throw new Error("No se ha podido leer el valor del UTXO. Repite el paso 1.");
+    const outputs = [{
+        valor: Number(document.getElementById("resultado-output").dataset.value),
+        script: document.getElementById("output-script").textContent.trim()
+    }];
+    if (paso4.dataset.hayCambio === "1") outputs.push({ valor: Number(paso4.dataset.cambioValor), script: paso4.dataset.cambioScript });
+    const outputsHex = outputs.map((o) => numeroALEHex(o.valor, 8) + compactSizeHex(o.script.length / 2) + o.script).join("");
+    const version = numeroALEHex(1, 4), locktime = numeroALEHex(0, 4);
+    const outpoint = invertirBytesHex(txid) + numeroALEHex(vout, 4);
+    const hex = version + "01" + outpoint + "00" + sequence + compactSizeHex(outputs.length) + outputsHex + locktime;
+    if (hex !== document.getElementById("paso5").dataset.txHexSinFirmar) {
+        throw new Error("La transacción sin firmar ya no coincide con los pasos anteriores. Repite el paso 5.");
+    }
+    return { sequence, utxoValue, utxoScript, outputsHex, version, locktime, outpoint, hex };
+}
+
+function reiniciarPasos67() {
+    ["paso6", "paso7"].forEach((id) => {
+        const el = document.getElementById(id);
+        el.style.display = "none";
+        delete el.dataset.sighash; delete el.dataset.hexBase;
+    });
+    ["resultado-sighash", "sighash-diagrama", "resultado-firma"].forEach((id) => {
+        document.getElementById(id).style.display = "none";
+    });
+    delete document.getElementById("paso5").dataset.txHexSinFirmar;
+}
+
+function hexABytes(hex) { return new Uint8Array((hex.match(/.{2}/g) || []).map((b) => parseInt(b, 16))); }
+function bytesAHex(bytes) { return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join(""); }
+
+async function sha256Hex(hex) {
+    return bytesAHex(new Uint8Array(await crypto.subtle.digest("SHA-256", hexABytes(hex))));
+}
+async function sha256dHex(hex) { return sha256Hex(await sha256Hex(hex)); }
+
+// --- PASO 6: sighash BIP143 (SIGHASH_ALL) -----------------------------
+
+function mostrarEstadoSighash(texto, tipo = "") {
+    const el = document.getElementById("estado-sighash");
+    el.textContent = texto;
+    el.className = "estado" + (tipo ? " " + tipo : "");
+}
+
+async function calcularSighash() {
+    document.getElementById("resultado-sighash").style.display = "none";
+    document.getElementById("sighash-diagrama").style.display = "none";
+    document.getElementById("paso7").style.display = "none";
+    document.getElementById("resultado-firma").style.display = "none";
+
+    if (document.getElementById("resultado-serializar").style.display !== "block") {
+        mostrarEstadoSighash("Primero debes construir la transacción sin firmar en el paso 5.", "error");
+        return;
+    }
+    if (!window.crypto || !crypto.subtle) {
+        mostrarEstadoSighash("Este navegador no ofrece SHA-256 nativo (se necesita HTTPS o abrir el archivo en local).", "error");
+        return;
+    }
+    try {
+        const t = reconstruirTxSinFirmar();
+        const hashPrevouts = await sha256dHex(t.outpoint);
+        const hashSequence = await sha256dHex(t.sequence);
+        const hashOutputs = await sha256dHex(t.outputsHex);
+        const scriptCode = "1976a914" + t.utxoScript.slice(4) + "88ac";
+        const valorUtxo = numeroALEHex(t.utxoValue, 8);
+        const sighashType = numeroALEHex(1, 4);
+
+        const preimage = t.version + hashPrevouts + hashSequence + t.outpoint + scriptCode +
+            valorUtxo + t.sequence + hashOutputs + t.locktime + sighashType;
+        const sighash = await sha256dHex(preimage);
+
+        document.getElementById("sighash-final").textContent = sighash;
+        document.getElementById("sighash-preimage").textContent = preimage;
+        document.getElementById("resultado-sighash").style.display = "block";
+
+        const paso6 = document.getElementById("paso6");
+        paso6.dataset.sighash = sighash;
+        paso6.dataset.hexBase = t.hex;
+
+        const diagrama = document.getElementById("sighash-diagrama");
+        const fila = (etq, val, cl = "dg-hex") => `<span class="dg-branch">├──</span> <span class="dg-label">${etq}</span> <span class="${cl}">${val}</span>\n`;
+        diagrama.innerHTML = `<span class="dg-root">PREIMAGE BIP143 (SIGHASH_ALL)</span>\n<span class="dg-branch">│</span>\n` +
+            fila("version", t.version) + fila("hashPrevouts", hashPrevouts) + fila("hashSequence", hashSequence) +
+            fila("outpoint", t.outpoint) + fila("scriptCode", scriptCode) +
+            fila("valor del UTXO", t.utxoValue.toLocaleString("es-ES") + " sats", "dg-value") +
+            fila("sequence", t.sequence) + fila("hashOutputs", hashOutputs) + fila("locktime", t.locktime) +
+            `<span class="dg-branch">└──</span> <span class="dg-label">sighash type</span> <span class="dg-hex">${sighashType}</span>`;
+        diagrama.style.display = "block";
+        document.getElementById("paso7").style.display = "block";
+        mostrarEstadoSighash("Sighash calculado. Este es el mensaje que firmará la clave privada.", "ok");
+    } catch (error) {
+        mostrarEstadoSighash(error.message || "No se ha podido calcular el sighash.", "error");
+    }
+}
+
+// --- PASO 7: ECDSA secp256k1, witness y transacción final --------------
+
+const SECP_P = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2Fn;
+const SECP_N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n;
+const SECP_G = {
+    x: 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798n,
+    y: 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8n
+};
+
+const modP = (a) => { const r = a % SECP_P; return r >= 0n ? r : r + SECP_P; };
+const bigAHex = (n) => n.toString(16).padStart(64, "0");
+
+function invMod(a, m) {
+    let x0 = 1n, x1 = 0n, r0 = ((a % m) + m) % m, r1 = m;
+    while (r1 !== 0n) {
+        const q = r0 / r1;
+        [r0, r1] = [r1, r0 - q * r1];
+        [x0, x1] = [x1, x0 - q * x1];
+    }
+    if (r0 !== 1n) throw new Error("Valor no invertible.");
+    return ((x0 % m) + m) % m;
+}
+
+// Puntos jacobianos [X, Y, Z]; null = punto en el infinito.
+function jDoble(p) {
+    if (!p || p[1] === 0n) return null;
+    const [X, Y, Z] = p;
+    const A = modP(X * X), B = modP(Y * Y), C = modP(B * B);
+    const D = modP(2n * ((X + B) * (X + B) - A - C));
+    const E = 3n * A, F = modP(E * E);
+    const X3 = modP(F - 2n * D);
+    return [X3, modP(E * (D - X3) - 8n * C), modP(2n * Y * Z)];
+}
+
+function jSuma(p, q) {
+    if (!p) return q;
+    if (!q) return p;
+    const [X1, Y1, Z1] = p, [X2, Y2, Z2] = q;
+    const Z1Z1 = modP(Z1 * Z1), Z2Z2 = modP(Z2 * Z2);
+    const U1 = modP(X1 * Z2Z2), U2 = modP(X2 * Z1Z1);
+    const S1 = modP(Y1 * Z2 * Z2Z2), S2 = modP(Y2 * Z1 * Z1Z1);
+    if (U1 === U2) return S1 === S2 ? jDoble(p) : null;
+    const H = modP(U2 - U1), I = modP(4n * H * H), J = modP(H * I);
+    const r = modP(2n * (S2 - S1)), V = modP(U1 * I);
+    const X3 = modP(r * r - J - 2n * V);
+    return [X3, modP(r * (V - X3) - 2n * S1 * J), modP(2n * Z1 * Z2 * H)];
+}
+
+function jMultiplicar(k, punto) {
+    let R = null;
+    const Q = [punto.x, punto.y, 1n];
+    for (const bit of k.toString(2)) {
+        R = jDoble(R);
+        if (bit === "1") R = jSuma(R, Q);
+    }
+    return R;
+}
+
+function jAAfin(p) {
+    if (!p) return null;
+    const zi = invMod(p[2], SECP_P), zi2 = modP(zi * zi);
+    return { x: modP(p[0] * zi2), y: modP(p[1] * zi2 * zi) };
+}
+
+function clavePublicaComprimida(d) {
+    const P = jAAfin(jMultiplicar(d, SECP_G));
+    return { punto: P, hex: (P.y % 2n === 0n ? "02" : "03") + bigAHex(P.x) };
+}
+
+async function hmacSha256(claveBytes, datosBytes) {
+    const clave = await crypto.subtle.importKey("raw", claveBytes, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    return new Uint8Array(await crypto.subtle.sign("HMAC", clave, datosBytes));
+}
+
+const concatBytes = (...arr) => Uint8Array.from(arr.flatMap((a) => Array.from(a)));
+
+// Nonce determinista RFC 6979 (HMAC-SHA256).
+async function nonceRFC6979(dHex, hashHex) {
+    const x = hexABytes(dHex), h1 = hexABytes(hashHex);
+    let V = new Uint8Array(32).fill(1), K = new Uint8Array(32);
+    K = await hmacSha256(K, concatBytes(V, [0], x, h1));
+    V = await hmacSha256(K, V);
+    K = await hmacSha256(K, concatBytes(V, [1], x, h1));
+    V = await hmacSha256(K, V);
+    for (;;) {
+        V = await hmacSha256(K, V);
+        const k = BigInt("0x" + bytesAHex(V));
+        if (k >= 1n && k < SECP_N) return k;
+        K = await hmacSha256(K, concatBytes(V, [0]));
+        V = await hmacSha256(K, V);
+    }
+}
+
+function derEntero(n) {
+    let h = n.toString(16);
+    if (h.length % 2) h = "0" + h;
+    if (parseInt(h.slice(0, 2), 16) >= 0x80) h = "00" + h;
+    return "02" + (h.length / 2).toString(16).padStart(2, "0") + h;
+}
+
+async function firmarECDSA(d, sighashHex) {
+    const z = BigInt("0x" + sighashHex);
+    const k = await nonceRFC6979(bigAHex(d), sighashHex);
+    const R = jAAfin(jMultiplicar(k, SECP_G));
+    const r = R.x % SECP_N;
+    let s = (invMod(k, SECP_N) * ((z + r * d) % SECP_N)) % SECP_N;
+    if (r === 0n || s === 0n) throw new Error("Firma degenerada; repite el proceso.");
+    if (s > SECP_N / 2n) s = SECP_N - s; // s bajo (BIP62/BIP146)
+    return { r, s };
+}
+
+function verificarECDSA(Q, sighashHex, r, s) {
+    const z = BigInt("0x" + sighashHex), w = invMod(s, SECP_N);
+    const P = jAAfin(jSuma(jMultiplicar((z * w) % SECP_N, SECP_G),
+                           jMultiplicar((r * w) % SECP_N, Q)));
+    return !!P && P.x % SECP_N === r;
+}
+
+// RIPEMD-160 (necesario para hash160 = RIPEMD160(SHA256(pubkey))).
+function ripemd160(bytes) {
+    const rl = (x, n) => ((x << n) | (x >>> (32 - n))) >>> 0;
+    const R1 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,7,4,13,1,10,6,15,3,12,0,9,5,2,14,11,8,3,10,14,4,9,15,8,1,2,7,0,6,13,11,5,12,1,9,11,10,0,8,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13];
+    const R2 = [5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,12,15,10,4,1,5,8,7,6,2,13,14,0,3,9,11];
+    const S1 = [11,14,15,12,5,8,7,9,11,13,14,15,6,7,9,8,7,6,8,13,11,9,7,15,7,12,15,9,11,7,13,12,11,13,6,7,14,9,13,15,14,8,13,6,5,12,7,5,11,12,14,15,14,15,9,8,9,14,5,6,8,6,5,12,9,15,5,11,6,8,13,12,5,12,13,14,11,8,5,6];
+    const S2 = [8,9,9,11,13,15,15,5,7,7,8,11,14,14,12,6,9,13,15,7,12,8,9,11,7,7,12,7,6,15,13,11,9,7,15,11,8,6,6,14,12,13,5,14,13,13,7,5,15,5,8,11,14,14,6,14,6,9,12,9,12,5,15,8,8,5,12,9,12,5,14,6,8,13,6,5,15,13,11,11];
+    const K1 = [0, 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xA953FD4E];
+    const K2 = [0x50A28BE6, 0x5C4DD124, 0x6D703EF3, 0x7A6D76E9, 0];
+    const f = (j, x, y, z) =>
+        j < 16 ? (x ^ y ^ z) >>> 0 :
+        j < 32 ? ((x & y) | (~x & z)) >>> 0 :
+        j < 48 ? ((x | ~y) ^ z) >>> 0 :
+        j < 64 ? ((x & z) | (y & ~z)) >>> 0 : (x ^ (y | ~z)) >>> 0;
+
+    const n = bytes.length, total = ((n + 8) >> 6 << 6) + 64;
+    const m = new Uint8Array(total);
+    m.set(bytes); m[n] = 0x80;
+    const dv = new DataView(m.buffer);
+    dv.setUint32(total - 8, (n * 8) >>> 0, true);
+    dv.setUint32(total - 4, Math.floor(n / 0x20000000), true);
+
+    let h = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0];
+    for (let off = 0; off < total; off += 64) {
+        const X = Array.from({ length: 16 }, (_, i) => dv.getUint32(off + 4 * i, true));
+        let [a1, b1, c1, d1, e1] = h, [a2, b2, c2, d2, e2] = h;
+        for (let j = 0; j < 80; j++) {
+            let T = (rl((a1 + f(j, b1, c1, d1) + X[R1[j]] + K1[j >> 4]) >>> 0, S1[j]) + e1) >>> 0;
+            a1 = e1; e1 = d1; d1 = rl(c1, 10); c1 = b1; b1 = T;
+            T = (rl((a2 + f(79 - j, b2, c2, d2) + X[R2[j]] + K2[j >> 4]) >>> 0, S2[j]) + e2) >>> 0;
+            a2 = e2; e2 = d2; d2 = rl(c2, 10); c2 = b2; b2 = T;
+        }
+        const T = (h[1] + c1 + d2) >>> 0;
+        h = [T, (h[2] + d1 + e2) >>> 0, (h[3] + e1 + a2) >>> 0, (h[4] + a1 + b2) >>> 0, (h[0] + b1 + c2) >>> 0];
+    }
+    const out = new DataView(new ArrayBuffer(20));
+    h.forEach((v, i) => out.setUint32(4 * i, v, true));
+    return new Uint8Array(out.buffer);
+}
+
+async function hash160Hex(hex) {
+    const sha = new Uint8Array(await crypto.subtle.digest("SHA-256", hexABytes(hex)));
+    return bytesAHex(ripemd160(sha));
+}
+
+function mostrarEstadoFirma(texto, tipo = "") {
+    const el = document.getElementById("estado-firma");
+    el.textContent = texto;
+    el.className = "estado" + (tipo ? " " + tipo : "");
+}
+
+async function firmarTransaccion() {
+    document.getElementById("resultado-firma").style.display = "none";
+    const paso6 = document.getElementById("paso6");
+    if (document.getElementById("resultado-sighash").style.display !== "block" || !paso6.dataset.sighash) {
+        mostrarEstadoFirma("Primero debes calcular el sighash en el paso 6.", "error");
+        return;
+    }
+    const claveHex = document.getElementById("clave-privada").value.trim().toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(claveHex)) {
+        mostrarEstadoFirma("La clave privada debe tener 64 caracteres hexadecimales.", "error");
+        return;
+    }
+    try {
+        const d = BigInt("0x" + claveHex);
+        if (d < 1n || d >= SECP_N) throw new Error("Clave privada fuera de rango.");
+
+        const t = reconstruirTxSinFirmar();
+        if (t.hex !== paso6.dataset.hexBase) throw new Error("Los datos han cambiado desde el paso 6. Vuelve a calcular el sighash.");
+
+        const pub = clavePublicaComprimida(d);
+        if ((await hash160Hex(pub.hex)) !== t.utxoScript.slice(4)) {
+            throw new Error("Esta clave privada no corresponde a la dirección del UTXO que se gasta.");
+        }
+
+        const { r, s } = await firmarECDSA(d, paso6.dataset.sighash);
+        if (!verificarECDSA(pub.punto, paso6.dataset.sighash, r, s)) throw new Error("La firma generada no verifica. Abortado.");
+
+        const rDer = derEntero(r), sDer = derEntero(s);
+        const der = "30" + ((rDer.length + sDer.length) / 2).toString(16).padStart(2, "0") + rDer + sDer + "01";
+        const witness = "02" + compactSizeHex(der.length / 2) + der + compactSizeHex(pub.hex.length / 2) + pub.hex;
+
+        // version + marker/flag + inputs y outputs sin cambios + witness + locktime
+        const base = t.hex;
+        const firmada = base.slice(0, 8) + "0001" + base.slice(8, -8) + witness + base.slice(-8);
+
+        const txid = invertirBytesHex(await sha256dHex(base));
+        const wtxid = invertirBytesHex(await sha256dHex(firmada));
+        const bytesBase = base.length / 2, bytesTotal = firmada.length / 2;
+        const peso = bytesBase * 3 + bytesTotal, vsize = Math.ceil(peso / 4);
+        const fee = Number(document.getElementById("paso4").dataset.fee);
+
+        document.getElementById("firma-der").textContent = der;
+        document.getElementById("firma-pubkey").textContent = pub.hex;
+        document.getElementById("tx-firmada-hex").textContent = firmada;
+        document.getElementById("firma-txid").textContent = txid;
+        document.getElementById("firma-wtxid").textContent = wtxid;
+        document.getElementById("firma-tamano").textContent = `${bytesTotal} B / ${peso} WU / ${vsize} vB`;
+        document.getElementById("firma-tarifa").textContent =
+            `${fee.toLocaleString("es-ES")} sats · ${(fee / vsize).toFixed(2)} sat/vB`;
+        document.getElementById("resultado-firma").style.display = "block";
+        document.getElementById("clave-privada").value = ""; // la clave no debe quedarse en pantalla
+        mostrarEstadoFirma("Transacción firmada y verificada. Lista para difundir. La clave privada se ha borrado del campo.", "ok");
+    } catch (error) {
+        mostrarEstadoFirma(error.message || "No se ha podido firmar la transacción.", "error");
+    }
+}
+
+function copiarTxFirmada() {
+    const hex = document.getElementById("tx-firmada-hex").textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(hex).then(() => mostrarEstadoFirma("Hex copiado.", "ok"));
+}
+
+
 document.getElementById("txid").addEventListener("input", function () {
     this.value = this.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 64);
+    // Defensa extra: si el campo estuviera bloqueado y su valor cambiara
+    // igualmente (p. ej. autocompletado del navegador), se invalida todo.
+    if (utxoBloqueado) desbloquearUTXO();
 });
 
 document.getElementById("txid").addEventListener("keydown", function (event) {
     if (event.key === "Enter") consultarUTXO();
+});
+
+document.getElementById("vout").addEventListener("input", function () {
+    // Defensa extra: algunos navegadores permiten cambiar un <input type="number">
+    // con las flechas del spinner o la rueda del ratón aunque tenga readOnly.
+    // Si el UTXO ya estaba bloqueado y el valor cambia, se invalida todo.
+    if (utxoBloqueado) desbloquearUTXO();
 });
 
 document.getElementById("vout").addEventListener("keydown", function (event) {
