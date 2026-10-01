@@ -1,7 +1,7 @@
 <!--
   Copyright (c) 2026 clavebit.com
   Licensed under the MIT License.
-  Open Source: https://github.com
+  Open Source: https://github.com/rubencb27/clavebit.com
   EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO.
 -->
 <!DOCTYPE html>
@@ -10,12 +10,14 @@
     <title>Generador de Billetera HD BIP39 / BIP84</title>
     <meta charset="UTF-8">
     <!-- UN UNICO CSP CONSOLIDADO Y CORREGIDO -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; object-src 'none'; img-src 'self' data:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; object-src 'none'; img-src 'self' data:; base-uri 'none'; form-action 'none';">
     <meta name="description" content="Generador de frase semilla BIP39 y derivación HD BIP84 a partir de entropía">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
 
 <style>
+        .wif-oculto td:last-child { filter: blur(6px); user-select: none; transition: filter 0.15s; }
+        .wif-oculto td:last-child:hover { filter: blur(6px); } /* el hover no revela: solo el botón de abajo */
         .crypto-generator-container {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             max-width: 900px;
@@ -455,9 +457,9 @@
         <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com" rel="noopener" style="text-decoration: none;color: orange;">Clave privada, pública y dirección</a></p>
         <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/radar.html" rel="noopener" style="text-decoration: none;color: orange;">Consolidación de UTXOs</a></p>
 <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/rbf.html" rel="noopener" style="text-decoration: none;color: orange;">Rescatar transacción</a></p>
-
+ <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com/transaccion.html" rel="noopener" style="text-decoration: none;color: orange;">Generar transacción</a></p>
         <h1 class="main-titulo">Generador de Billetera HD (BIP39/BIP84)</h1>
-        <p class="main-descripcion">Genera una frase mnemotécnica de 24 palabras, su semilla (seed PBKDF2) con passphrase opcional, sus claves privada y pública extendidas, y direcciones SegWit nativas.</p>
+        <p class="main-descripcion">Genera una frase mnemotécnica de 24 palabras, su semilla (seed PBKDF2) con passphrase opcional, sus claves privada y pública extendidas, y direcciones SegWit nativas. <a href="./instrucciones2.pdf" download style="text-decoration: none; color: red;"><b>Instrucciones</b></a> de uso y seguridad</p>
     </div>
 
     <div class="grid-botones">
@@ -595,6 +597,12 @@
             <p class="paso-descripcion">Para los niveles no endurecidos (por ejemplo, pasar de m/84'/0'/0' a m/84'/0'/0'/0), se calcula I = HMAC-SHA512("código de cadena padre", clave pública comprimida padre || índice en 4 bytes). Esto es fundamental porque permite a las billeteras de solo lectura (watch-only) derivar infinitas direcciones públicas hijas usando únicamente la Clave Pública Extendida (zpub), sin llegar a exponer o tocar jamás las claves privadas.</p>
             <p class="paso-descripcion">Repetimos el proceso y pasamos de m/84'/0'/0'/0 a m/84'/0'/0'/0/0 y aquí tendríamos una clave privada hija con su clave pública asociada y dirección bc1q correspondiente (<a href="https://clavebit.com" style="text-decoration: none; color: red;" rel="noopener">ver</a>).</p>
 
+            <p class="paso-descripcion" style="color:#f87171;">
+                <b>Aviso:</b> esta tabla mostrará 200 claves privadas (WIF) en pantalla, ocultas por defecto.
+                Genera esta tabla sin conexión a Internet, en un equipo limpio, y evita capturas o grabaciones
+                de pantalla mientras estén visibles. Para uso normal basta con guardar la frase semilla: las
+                claves individuales se pueden volver a derivar siempre que la necesites.
+            </p>
             <div class="paso-botones">
                 <button class="btn-paso-clave" id="btn-derivar-direcciones-paso" style="background: #38bdf8; color: #0f172a;" onclick="generar200Direcciones()">
                     ⚡ Generar 100 Recepción + 100 Cambio
@@ -603,9 +611,10 @@
             </div>
 
             <div id="direcciones-section" style="display:none; margin-top: 20px;">
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
                     <button onclick="mostrarTab('recepcion')" id="tab-rec-btn" style="padding: 8px 16px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; background: #38bdf8; color: #0f172a;">📥 Recepción (100)</button>
                     <button onclick="mostrarTab('cambio')" id="tab-cam-btn" style="padding: 8px 16px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; background: #e2e8f0; color: #0f172a;">🔄 Cambio (100)</button>
+                    <button onclick="toggleClavesPrivadas()" id="toggle-wif-btn" style="padding: 8px 16px; font-weight: bold; border-radius: 6px; cursor: pointer; border: 1px solid #f87171; background: transparent; color: #f87171;">🙈 Mostrar claves privadas</button>
                 </div>
 
                 <div id="tabla-recepcion-container" class="terminal-box tabla-direcciones" style="max-height: 400px; overflow-y: auto;">
@@ -618,7 +627,7 @@
                                 <th style="padding: 6px;">Clave Privada (WIF)</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-recepcion-body"></tbody>
+                        <tbody id="tabla-recepcion-body" class="wif-oculto"></tbody>
                     </table>
                 </div>
 
@@ -632,7 +641,7 @@
                                 <th style="padding: 6px;">Clave Privada (WIF)</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-cambio-body"></tbody>
+                        <tbody id="tabla-cambio-body" class="wif-oculto"></tbody>
                     </table>
                 </div>
             </div>
@@ -736,7 +745,7 @@ async function derivarSeedDesdeFrase() {
     
     try {
         const mnemonicNormalizado = fraseGenerada.toLowerCase().normalize('NFKD');
-        const salt = 'mnemonic' + passphrase;
+        const salt = 'mnemonic' + passphrase.normalize('NFKD');
         const encoder = new TextEncoder();
         
         const keyMaterial = await window.crypto.subtle.importKey(
@@ -860,6 +869,7 @@ async function derivarDireccionDesdeHijo(priv){const pub=derivePublicKey(priv);r
 async function copiarTexto(variable,nombre){try{const valor=window[variable];if(!valor)throw new Error('No hay ningún valor para copiar.');await navigator.clipboard.writeText(valor);alert(nombre+' copiado.');}catch(e){alert('No se pudo copiar: '+e.message);}}
 async function copiarFrase(){if(fraseGenerada)await navigator.clipboard.writeText(fraseGenerada);}
 async function copiarSeed(){if(seedGenerada)await navigator.clipboard.writeText(bytesToHex(seedGenerada));}
+function toggleClavesPrivadas(){const btn=document.getElementById('toggle-wif-btn');const tbs=[document.getElementById('tabla-recepcion-body'),document.getElementById('tabla-cambio-body')];const oculto=tbs[0]&&tbs[0].classList.contains('wif-oculto');tbs.forEach(tb=>{if(tb)tb.classList.toggle('wif-oculto',!oculto);});if(btn)btn.textContent=oculto?'🙈 Ocultar claves privadas':'👁️ Mostrar claves privadas';}
 function mostrarTab(tab){const r=document.getElementById('tabla-recepcion-container'),c=document.getElementById('tabla-cambio-container'),rb=document.getElementById('tab-rec-btn'),cb=document.getElementById('tab-cam-btn');if(!r||!c)return;if(tab==='recepcion'){r.style.display='block';c.style.display='none';if(rb)rb.classList.add('active');if(cb)cb.classList.remove('active');}else{r.style.display='none';c.style.display='block';if(cb)cb.classList.add('active');if(rb)rb.classList.remove('active');}}
 
 async function derivarClaveMaestra() {
@@ -917,34 +927,75 @@ async function derivarClaveMaestra() {
 
 async function generar200Direcciones() {
     if (!zprvGenerada) return alert('⚠️ Debes derivar la Clave Maestra primero.');
-    const loading=document.getElementById('dir-loading'); const headerLoading=document.getElementById('dir-loading-header');
-    const btn1=document.getElementById('btn-derivar-direcciones-paso'); const btn2=document.getElementById('btn-derivar-direcciones-header');
-    if(loading)loading.style.display='inline'; if(headerLoading)headerLoading.style.display='inline'; if(btn1)btn1.disabled=true;if(btn2)btn2.disabled=true;
-    try{
-        /* zpub/zprv del nodo cuenta -> derivamos 0 (externa) y 1 (cambio), ambas no endurecidas. */
-        let accountPriv=null,accountChain=null;
-        // Re-derivar desde la seed evita almacenar claves privadas adicionales en el DOM.
-        const master=await hmacSha512(new TextEncoder().encode('Bitcoin seed'),seedGenerada);
-        accountPriv=master.slice(0,32);accountChain=master.slice(32);
-        for(const i of [84,0,0]){const d=await derivarHijoHardened(accountPriv,accountChain,i);accountPriv=d.privKey;accountChain=d.chainCode;}
-        const rec=await derivarHijoNormal(accountPriv,accountChain,0), chg=await derivarHijoNormal(accountPriv,accountChain,1);
-        const recBody=document.getElementById('tabla-recepcion-body'),chgBody=document.getElementById('tabla-cambio-body'); if(recBody)recBody.innerHTML='';if(chgBody)chgBody.innerHTML='';
-        for(let i=0;i<100;i++){
-            const a=await derivarHijoNormal(rec.privKey,rec.chainCode,i);const x=await derivarDireccionDesdeHijo(a.privKey);
-            if(recBody)recBody.insertAdjacentHTML('beforeend',`<tr><td style="padding:6px;">${i}</td><td style="padding:6px;">${x.address}</td><td style="padding:6px;word-break:break-all;">${bytesToHex(x.pub)}</td><td style="padding:6px;word-break:break-all;">${x.wif}</td></tr>`);
-            const b=await derivarHijoNormal(chg.privKey,chg.chainCode,i);const y=await derivarDireccionDesdeHijo(b.privKey);
-            if(chgBody)chgBody.insertAdjacentHTML('beforeend',`<tr><td style="padding:6px;">${i}</td><td style="padding:6px;">${y.address}</td><td style="padding:6px;word-break:break-all;">${bytesToHex(y.pub)}</td><td style="padding:6px;word-break:break-all;">${y.wif}</td></tr>`);
+    
+    const loading = document.getElementById('dir-loading');
+    const headerLoading = document.getElementById('dir-loading-header');
+    const btn1 = document.getElementById('btn-derivar-direcciones-paso');
+    const btn2 = document.getElementById('btn-derivar-direcciones-header');
+    
+    // 1. Mostrar texto de carga y deshabilitar botones
+    if (loading) loading.style.display = 'inline';
+    if (headerLoading) headerLoading.style.display = 'inline';
+    if (btn1) btn1.disabled = true;
+    if (btn2) btn2.disabled = true;
+
+    // 2. Dar tiempo al navegador para renderizar el mensaje antes del bucle pesado
+    setTimeout(async () => {
+        try {
+            /* zpub/zprv del nodo cuenta -> derivamos 0 (externa) y 1 (cambio), ambas no endurecidas. */
+            let accountPriv = null, accountChain = null;
+            
+            // Re-derivar desde la seed evita almacenar claves privadas adicionales en el DOM.
+            const master = await hmacSha512(new TextEncoder().encode('Bitcoin seed'), seedGenerada);
+            accountPriv = master.slice(0, 32);
+            accountChain = master.slice(32);
+            
+            for (const i of [84, 0, 0]) {
+                const d = await derivarHijoHardened(accountPriv, accountChain, i);
+                accountPriv = d.privKey;
+                accountChain = d.chainCode;
+            }
+            
+            const rec = await derivarHijoNormal(accountPriv, accountChain, 0);
+            const chg = await derivarHijoNormal(accountPriv, accountChain, 1);
+            
+            const recBody = document.getElementById('tabla-recepcion-body');
+            const chgBody = document.getElementById('tabla-cambio-body');
+            
+            if (recBody) recBody.innerHTML = '';
+            if (chgBody) chgBody.innerHTML = '';
+
+            for (let i = 0; i < 100; i++) {
+                const a = await derivarHijoNormal(rec.privKey, rec.chainCode, i);
+                const x = await derivarDireccionDesdeHijo(a.privKey);
+                if (recBody) recBody.insertAdjacentHTML('beforeend', `<tr><td style="padding:6px;">${i}</td><td style="padding:6px;">${x.address}</td><td style="padding:6px;word-break:break-all;">${bytesToHex(x.pub)}</td><td style="padding:6px;word-break:break-all;">${x.wif}</td></tr>`);
+
+                const b = await derivarHijoNormal(chg.privKey, chg.chainCode, i);
+                const y = await derivarDireccionDesdeHijo(b.privKey);
+                if (chgBody) chgBody.insertAdjacentHTML('beforeend', `<tr><td style="padding:6px;">${i}</td><td style="padding:6px;">${y.address}</td><td style="padding:6px;word-break:break-all;">${bytesToHex(y.pub)}</td><td style="padding:6px;word-break:break-all;">${y.wif}</td></tr>`);
+            }
+
+            const sec = document.getElementById('direcciones-section');
+            if (sec) sec.style.display = 'block';
+            mostrarTab('recepcion');
+        } catch (e) {
+            alert('Error al derivar direcciones: ' + e.message);
+        } finally {
+            // 3. Ocultar textos de carga y volver a habilitar botones al terminar
+            if (loading) loading.style.display = 'none';
+            if (headerLoading) headerLoading.style.display = 'none';
+            if (btn1) btn1.disabled = false;
+            if (btn2) btn2.disabled = false;
         }
-        const sec=document.getElementById('direcciones-section');if(sec)sec.style.display='block';mostrarTab('recepcion');
-    }catch(e){alert('Error al derivar direcciones: '+e.message);}finally{if(loading)loading.style.display='none';if(headerLoading)headerLoading.style.display='none';if(btn1)btn1.disabled=false;if(btn2)btn2.disabled=false;}
+    }, 50);
 }
 </script>
 
 <footer style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #666; font-size: 14px;">
     <p>
         © 2026 <strong>clavebit.com</strong> | 
-        Código abierto bajo <a href="https://github.com/rubencb27/clavebit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
-        <a href="https://github.com/rubencb27/clavebit" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
+        Código abierto bajo <a href="https://github.com/rubencb27/clavebit.com/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Licencia MIT</a> | 
+        <a href="https://github.com/rubencb27/clavebit.com" target="_blank" rel="noopener noreferrer" style="color: #f7931a; text-decoration: none;">Código abierto y auditable. Revisa nuestro repositorio en GitHub</a>
         | Cero analíticas, cero rastreo, privacidad absoluta
     </p>
     
