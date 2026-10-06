@@ -1,5 +1,5 @@
-# 🪙 clavebit.com - Calculadora de Claves Privadas Bitcoin y billetera jerárquica con frase semilla. Consolidación de Utxos. Rescatar una transacción atascada (RBF y CPFP). Generador de transacciones.
-Una herramienta web minimalista, rápida y segura para calcular claves privadas de Bitcoin de forma local. Desarrollada exclusivamente con HTML, CSS y JavaScript puro, sin dependencias externas ni instaladores. Generador de billetera jerárquica HD (BIP39/BIP84). Además cuenta con dos de las herramientas más útiles para el uso del Bitcoin: consolidación de UTXOs y rescatar una transacción atascada (RBF y CPFP). Generador de transacciones.
+# 🪙 clavebit.com - Calculadora de Claves Privadas Bitcoin y billetera jerárquica con frase semilla. Generador de transacciones.
+Una herramienta web minimalista, rápida y segura para calcular claves privadas de Bitcoin de forma local. Desarrollada exclusivamente con HTML, CSS y JavaScript puro, sin dependencias externas ni instaladores. Generador de billetera jerárquica HD (BIP39/BIP84). Generador de transacciones.
 
 
 ## 🛡️ Principios de Seguridad (Trust No One)
@@ -14,8 +14,6 @@ En el mundo Bitcoin, la seguridad es lo primero. Esta herramienta ha sido diseñ
 
 - index.html: e45d17e555612c091c1692532ab4dfd7cab450d9c22176297abe66cfa131dae4
 - instrucciones.pdf: e632fd790f8a21b5b5ddaf84d8058ddfa2cfb42b238ff4ebfc418b50e262a2d5
-- radar.html: c6a3e65cba049f521ae55cae64bcab65c2d71cb2c0e837ab2a70b6a7fbbc84bb
-- rbf.html: aaa093fb0cc1cc1ccc9919a871a3d588c06696193f7f287e737ba287cbbe719a
 - transaccion.html: 4333fb3fed04e9f95d990c0aa637f34ec905abf7f03f1f22db93eea9529ee5b4
 - billeterahd.html: a78a20311d723e79672b1e50703ec659e2cad2df959a1bfbc6c4a08449d51fc1
 
