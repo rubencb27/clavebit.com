@@ -385,6 +385,11 @@
             color: #64748b;
         }
 
+        @media (max-width: 600px) {
+            .resultado-grid { grid-template-columns: 1fr !important; }
+            .crypto-generator-container { padding: 16px; margin: 10px; }
+        }
+
 </style>
 </head>
 <body>
@@ -401,14 +406,9 @@
 			
         </p>
 		
-		   <p class="main-descripcion" style="color: #f7931a;">>> <a href="https://clavebit.com" rel="noopener" style="text-decoration: none; color: orange;">Clave privada, pública y dirección</a></p> 
+		   <p class="main-descripcion" style="color: #f7931a;">&gt;&gt; <a href="https://clavebit.com" rel="noopener" style="text-decoration: none; color: orange;">Clave privada, pública y dirección</a></p> 
 
-        <p class="main-descripcion" style="color: #f7931a;">
-            &gt;&gt; <a href="https://clavebit.com/radar.html" rel="noopener" style="text-decoration: none;color: orange;">Consolidación de UTXOs</a>
-        </p>
-        <p class="main-descripcion" style="color: #f7931a;">
-            &gt;&gt; <a href="https://clavebit.com/rbf.html" rel="noopener" style="text-decoration: none;color: orange;">Rescatar transacción</a>
-        </p>
+       
 
         <h1 class="main-titulo">Generador de transacciones Bitcoin</h1>
         <p class="main-descripcion">
@@ -419,15 +419,14 @@
 
     <div class="paso-seccion p1">
         <span class="paso-tag">PASO 1: SELECCIONAR UTXO</span>
-        <h4 class="paso-titulo">Elegir el UTXO que vamos a gastar</h4>
+        <h2 class="paso-titulo">Elegir el UTXO que vamos a gastar</h2>
         <p class="paso-descripcion">
             Una transacción Bitcoin no empieza indicando simplemente una cantidad.
             Primero debemos elegir una salida no gastada (UTXO) de una transacción anterior.
             Para identificarla necesitamos su TXID y el índice de salida (<b>vout</b>).
         </p>
         <p class="paso-descripcion">
-            El TXID y la dirección de destino se enviarán a mempool.space para verificarlos, lo que
-            asocia tu IP con ambos datos. Para más privacidad, usa Tor Browser.
+            El TXID y el vout se enviarán a mempool.space para verificarlos (la dirección de destino y las claves nunca se envían).
         </p>
 
         <div class="transaction-form">
@@ -459,7 +458,7 @@
 
     <div id="resultado" class="paso-seccion p1" style="display:none;">
         <span class="paso-tag">UTXO DISPONIBLE</span>
-        <h4 class="paso-titulo">Datos de la salida que vamos a gastar</h4>
+        <h2 class="paso-titulo">Datos de la salida que vamos a gastar</h2>
         <p class="paso-descripcion">
             Esta salida pertenece a la transacción anterior y, al estar sin gastar,
             puede utilizarse como input de nuestra nueva transacción.
@@ -500,7 +499,7 @@
 
     <div id="gastado" class="paso-seccion p1" style="display:none;">
         <span class="paso-tag">UTXO NO DISPONIBLE</span>
-        <h4 class="paso-titulo">Esta salida ya ha sido gastada</h4>
+        <h2 class="paso-titulo">Esta salida ya ha sido gastada</h2>
         <p class="paso-descripcion">
             El output indicado ya fue utilizado como input de otra transacción.
             Por tanto, ya no es un UTXO y no puede volver a utilizarse en una nueva transacción.
@@ -516,33 +515,31 @@
 
     <div id="explicacion" class="paso-seccion p1" style="display:none;">
         <span class="paso-tag">¿QUÉ ACABAMOS DE SELECCIONAR?</span>
-        <h4 class="paso-titulo">De output anterior a input nuevo</h4>
+        <h2 class="paso-titulo">De output anterior a input nuevo</h2>
         <p class="paso-descripcion">
             La transacción anterior creó una salida con una cantidad de satoshis y una
             condición de gasto. Mientras esa salida no se haya gastado, es un UTXO.
             Nuestra nueva transacción hará referencia a ese UTXO mediante TXID + vout.
         </p>
 
-        <div class="terminal-box">TRANSACCIÓN ANTERIOR
-        │
-        └── OUTPUT #<span id="exp-vout">0</span>
-              │
-              ├── <span id="exp-value">0</span> sats
-              │
-              └── scriptPubKey
-                    │
-                    ▼
-                   UTXO
-                    │
-                    │ gastar
-                    ▼
-NUEVA TRANSACCIÓN
-        │
-        └── INPUT #0</div>
+        <div class="output-diagrama"><span class="dg-root">TRANSACCIÓN ANTERIOR</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">└──</span> <span class="dg-label">OUTPUT #</span><span class="dg-value" id="exp-vout">0</span>
+<span class="dg-branch">    │</span>
+<span class="dg-branch">    ├──</span> <span class="dg-label">VALUE</span>
+<span class="dg-branch">    │   └──</span> <span class="dg-value" id="exp-value">0</span> <span class="dg-sublabel">sats</span>
+<span class="dg-branch">    │</span>
+<span class="dg-branch">    └──</span> <span class="dg-label">SCRIPT PUBKEY</span>
+<span class="dg-branch">        └──</span> <span class="dg-arrow">→</span> <span class="dg-hex">UTXO</span>
+<span class="dg-branch">            │</span>
+<span class="dg-branch">            ▼</span> <span class="dg-sublabel">gastar</span>
+<span class="dg-root">NUEVA TRANSACCIÓN</span>
+<span class="dg-branch">│</span>
+<span class="dg-branch">└──</span> <span class="dg-label">INPUT #0</span></div>
 
         <p class="paso-descripcion" style="margin-top:12px;">
-            Como esta primera versión se centra en direcciones <b>bc1q</b>,
-            aceptamos únicamente outputs <b>P2WPKH / SegWit nativo</b>.
+            Nos centramos en direcciones <b>bc1q</b>,
+             y aceptamos únicamente outputs <b>P2WPKH / SegWit nativo</b>.
         </p>
     </div>
 
@@ -550,7 +547,7 @@ NUEVA TRANSACCIÓN
     <!-- PASO 2 -->
     <div id="paso2" class="paso-seccion p2" style="display:none;">
         <span class="paso-tag">PASO 2: CREAR OUTPUT</span>
-        <h4 class="paso-titulo">Crear la salida de nuestra nueva transacción</h4>
+        <h2 class="paso-titulo">Crear la salida de nuestra nueva transacción</h2>
         <p class="paso-descripcion">
             Ahora indicamos a qué dirección <b>bc1q</b> queremos enviar los satoshis
             y qué cantidad queremos enviar. ClaveBit convertirá localmente la dirección
@@ -621,7 +618,7 @@ NUEVA TRANSACCIÓN
     <div id="paso3" class="paso-seccion p3" style="display:none;">
         <span class="paso-tag">PASO 3: CREAR INPUT · RBF</span>
 
-        <h4 class="paso-titulo">Crear el input de nuestra nueva transacción</h4>
+        <h2 class="paso-titulo">Crear el input de nuestra nueva transacción</h2>
 
         <p class="paso-descripcion">
             El input indica qué UTXO anterior vamos a gastar.
@@ -707,7 +704,7 @@ NUEVA TRANSACCIÓN
 
     <div id="paso4" class="paso-seccion p4" style="display:none;">
         <span class="paso-tag">PASO 4: CALCULAR CAMBIO Y COMISIÓN</span>
-        <h4 class="paso-titulo">Comisión de red y salida de cambio</h4>
+        <h2 class="paso-titulo">Comisión de red y salida de cambio</h2>
         <p class="paso-descripcion">
             El UTXO que gastamos vale más que la cantidad que enviamos. La diferencia
             se reparte entre la <b>comisión</b> que cobran los mineros y una salida de
@@ -751,7 +748,7 @@ NUEVA TRANSACCIÓN
 
             <div class="campo">
                 <label for="cambio-direccion">Dirección de cambio (vuelta)</label>
-                <small>Dirección bc1q propia donde recibirás el sobrante. No tiene que ser la misma que gastamos.</small>
+                <small>Dirección bc1q propia donde recibirás el sobrante. Puede ser la misma que gastamos u otra.</small>
                 <input id="cambio-direccion" type="text" maxlength="42" autocomplete="off"
                        spellcheck="false" placeholder="bc1q...">
             </div>
@@ -779,11 +776,11 @@ NUEVA TRANSACCIÓN
                 <code id="cambio-vsize"></code>
             </div>
             <div class="dato">
-                <strong>Comisión</strong>
+                <strong>Comisión estimada</strong>
                 <code id="cambio-fee"></code>
             </div>
             <div class="dato">
-                <strong>Cambio (vuelta)</strong>
+                <strong>Cambio estimado</strong>
                 <code id="cambio-valor"></code>
             </div>
             <div class="dato">
@@ -793,9 +790,9 @@ NUEVA TRANSACCIÓN
         </div>
 
         <div id="info-sin-cambio" class="info-output" style="display:none;">
-            El sobrante es inferior al límite de "polvo" (<b>dust</b>, 294 sats) para crear
-            una salida P2WPKH, así que no se genera salida de cambio: todo el sobrante pasa
-            a formar parte de la comisión.
+            El sobrante es inferior al umbral de <b>dust</b> configurado (294 sats,
+            correspondiente a la política estándar de Bitcoin Core a 3 sat/vB), así que no se genera
+            salida de cambio: todo el sobrante pasa a formar parte de la comisión.
         </div>
 
         <div id="cambio-diagrama" class="output-diagrama" style="display:none;"></div>
@@ -809,7 +806,7 @@ NUEVA TRANSACCIÓN
 
     <div id="paso5" class="paso-seccion p5" style="display:none;">
         <span class="paso-tag">PASO 5: SERIALIZAR TRANSACCIÓN (SIN FIRMAR)</span>
-        <h4 class="paso-titulo">Construir el hexadecimal de la transacción</h4>
+        <h2 class="paso-titulo">Construir el hexadecimal de la transacción</h2>
         <p class="paso-descripcion">
             Con el input y los outputs ya definidos, se puede construir la transacción
             completa en formato binario (hexadecimal): versión, lista de inputs, lista
@@ -863,7 +860,7 @@ NUEVA TRANSACCIÓN
 
     <div id="paso6" class="paso-seccion p6" style="display:none;">
         <span class="paso-tag">PASO 6: CALCULAR EL SIGHASH (BIP143)</span>
-        <h4 class="paso-titulo">El mensaje que se va a firmar</h4>
+        <h2 class="paso-titulo">El mensaje que se va a firmar</h2>
         <p class="paso-descripcion">
             En una transacción SegWit no se firma el hexadecimal completo, sino un
             <b>resumen</b> (sighash) definido en el BIP143. Este resumen compromete
@@ -906,19 +903,20 @@ NUEVA TRANSACCIÓN
 
     <div id="paso7" class="paso-seccion p7" style="display:none;">
         <span class="paso-tag">PASO 7: FIRMAR Y CONSTRUIR EL WITNESS</span>
-        <h4 class="paso-titulo">Firmar el sighash con la clave privada</h4>
+        <h2 class="paso-titulo">Firmar el sighash con la clave privada</h2>
         <p class="paso-descripcion">
             Se firma el sighash con ECDSA (secp256k1, nonce determinista RFC 6979, <code>s</code> bajo),
             se codifica la firma en DER + <code>01</code> (SIGHASH_ALL) y se construye el
-            <b>witness</b> <code>[firma, clave pública]</code>. La clave privada se usa solo en tu
-            navegador y no se envía ni se guarda. Esta web es educativa: con importes relevantes,
-            firma con tu cartera habitual o un dispositivo offline.
+            <b>witness</b> <code>[firma, clave pública]</code>. La clave privada puede indicarse en
+            formato <b>WIF</b> (el que exportan las carteras) o en <b>hex</b> (los 32 bytes en bruto).
+            Se usa solo en tu navegador y no se envía ni se guarda. 
         </p>
         <div class="transaction-form">
             <div class="campo">
-                <label for="clave-privada">Clave privada (hex, 64 caracteres)</label>
-                <input id="clave-privada" type="password" maxlength="64" autocomplete="off"
-                       spellcheck="false" placeholder="64 caracteres hexadecimales">
+                <label for="clave-privada">Clave privada (WIF o hex)</label>
+                <small>WIF comprimido (empieza por K o L) o 64 caracteres hexadecimales.</small>
+                <input id="clave-privada" type="password" maxlength="64" autocomplete="new-password"
+                       spellcheck="false" placeholder="KwDi... o 64 caracteres hexadecimales">
             </div>
             <button class="btn-principal" type="button" onclick="firmarTransaccion()">Firmar transacción</button>
         </div>
@@ -938,8 +936,7 @@ NUEVA TRANSACCIÓN
                 <div class="dato"><strong>Comisión y tarifa efectiva</strong><code id="firma-tarifa"></code></div>
             </div>
             <div class="info-output">
-                Esta web no emite la transacción. Copia el hex y difúndelo tú mismo
-                (mempool.space, Blockstream o tu propio nodo).
+                Esta web no emite la transacción. Copia el hex y pégalo en transmitir transacción de mempool.space <a href="https://mempool.space/tx/push" target="_blank" rel="noopener noreferrer">Transmitir transacción</a>
             </div>
         </div>
     </div>
@@ -1107,6 +1104,15 @@ async function consultarUTXO() {
             throw new Error(
                 "El vout seleccionado no es un P2WPKH mainnet (bc1q). Selecciona una salida bc1q."
             );
+        }
+
+        // No confiamos solo en el tipo devuelto por la API: el script y el valor
+        // deben tener una forma exacta y representar satoshis enteros seguros.
+        if (!Number.isSafeInteger(Number(salida.value)) || Number(salida.value) <= 0) {
+            throw new Error("La API ha devuelto un valor de UTXO no válido.");
+        }
+        if (typeof salida.scriptpubkey !== "string" || !/^0014[0-9a-fA-F]{40}$/.test(salida.scriptpubkey)) {
+            throw new Error("La API ha devuelto un scriptPubKey P2WPKH no válido.");
         }
 
         /*
@@ -1296,8 +1302,22 @@ function mostrarEstadoOutput(texto, tipo = "") {
     el.className = "estado" + (tipo ? " " + tipo : "");
 }
 
-function crearOutput() {
+// Al rehacer el output, todo lo calculado después (cambio, comisión, tx sin
+// firmar, sighash) queda obsoleto y se descarta para no mezclar datos viejos.
+function invalidarPasos45() {
+    ["paso3", "paso4", "resultado-cambio", "info-sin-cambio", "cambio-diagrama",
+     "paso5", "resultado-serializar", "tx-raw-diagrama"]
+        .forEach((id) => { document.getElementById(id).style.display = "none"; });
+    const p4 = document.getElementById("paso4");
+    ["hayCambio", "cambioValor", "cambioDireccion", "cambioScript", "fee", "vsize",
+     "feerate", "feerateBase", "margen", "txVersion"]
+        .forEach((k) => { delete p4.dataset[k]; });
+    delete document.getElementById("resultado-output").dataset.value;
     reiniciarPasos67();
+}
+
+function crearOutput() {
+    invalidarPasos45();
     const destino = document.getElementById("destino").value.trim();
     const cantidadTexto = document.getElementById("cantidad").value.trim();
     const cantidad = Number(cantidadTexto);
@@ -1309,7 +1329,7 @@ function crearOutput() {
         return;
     }
 
-    if (!/^bc1q[0-9ac-hj-np-z]{38}$/.test(destino)) {
+    if (!/^bc1q[02-9ac-hj-np-z]{38}$/.test(destino)) {
         mostrarEstadoOutput("La dirección debe ser una bc1q mainnet válida de 42 caracteres.", "error");
         return;
     }
@@ -1320,7 +1340,7 @@ function crearOutput() {
     }
 
     if (cantidad < DUST_LIMIT_SATS) {
-        mostrarEstadoOutput(`La cantidad es inferior al límite de polvo (${DUST_LIMIT_SATS} sats): los nodos rechazarían la transacción.`, "error");
+        mostrarEstadoOutput(`La cantidad es inferior al umbral de dust configurado (${DUST_LIMIT_SATS} sats): con la política estándar correspondiente, la salida se trataría como dust.`, "error");
         return;
     }
 
@@ -1487,6 +1507,7 @@ function alternarMargen() {
 }
 
 function calcularCambio() {
+    reiniciarPasos67();
     document.getElementById("resultado-cambio").style.display = "none";
     document.getElementById("info-sin-cambio").style.display = "none";
     document.getElementById("cambio-diagrama").style.display = "none";
@@ -1531,7 +1552,7 @@ function calcularCambio() {
 
     const cambioDireccion = document.getElementById("cambio-direccion").value.trim();
 
-    if (!/^bc1q[0-9ac-hj-np-z]{38}$/.test(cambioDireccion)) {
+    if (!/^bc1q[02-9ac-hj-np-z]{38}$/.test(cambioDireccion)) {
         mostrarEstadoCambio("La dirección de cambio debe ser una bc1q mainnet válida de 42 caracteres.", "error");
         return;
     }
@@ -1638,7 +1659,16 @@ function calcularCambio() {
     document.getElementById("resultado-serializar").style.display = "none";
     document.getElementById("tx-raw-diagrama").style.display = "none";
 
-    mostrarEstadoCambio("Comisión y cambio calculados correctamente.", "ok");
+    if (feeFinal > outputValue * 0.1 && feeFinal > 1000) {
+        const pct = (feeFinal / outputValue * 100).toFixed(1);
+        mostrarEstadoCambio(
+            `Calculado, pero ¡atención!: la comisión (${feeFinal.toLocaleString("es-ES")} sats) es el ${pct} % de lo que envías. ` +
+            "Revisa la tarifa y el cambio antes de continuar.",
+            "error"
+        );
+    } else {
+        mostrarEstadoCambio("Comisión y cambio calculados correctamente.", "ok");
+    }
 }
 
 
@@ -1801,6 +1831,13 @@ function reconstruirTxSinFirmar() {
         script: document.getElementById("output-script").textContent.trim()
     }];
     if (paso4.dataset.hayCambio === "1") outputs.push({ valor: Number(paso4.dataset.cambioValor), script: paso4.dataset.cambioScript });
+    if (!outputs.every((o) => Number.isSafeInteger(o.valor) && o.valor > 0)) {
+        throw new Error("Hay un output con importe no válido. Repite el paso 2.");
+    }
+    const sumaOutputs = outputs.reduce((a, o) => a + o.valor, 0);
+    if (sumaOutputs + Number(paso4.dataset.fee) !== utxoValue) {
+        throw new Error("Los importes no cuadran (UTXO ≠ outputs + comisión). Repite el paso 4.");
+    }
     const outputsHex = outputs.map((o) => numeroALEHex(o.valor, 8) + compactSizeHex(o.script.length / 2) + o.script).join("");
     const version = numeroALEHex(1, 4), locktime = numeroALEHex(0, 4);
     const outpoint = invertirBytesHex(txid) + numeroALEHex(vout, 4);
@@ -1966,9 +2003,14 @@ async function hmacSha256(claveBytes, datosBytes) {
 
 const concatBytes = (...arr) => Uint8Array.from(arr.flatMap((a) => Array.from(a)));
 
-// Nonce determinista RFC 6979 (HMAC-SHA256).
+// Nonce determinista RFC 6979 (HMAC-SHA256, con bits2octets).
 async function nonceRFC6979(dHex, hashHex) {
-    const x = hexABytes(dHex), h1 = hexABytes(hashHex);
+    const x = hexABytes(dHex);
+    // RFC6979: bits2octets(h1) = h1 reducido módulo n y serializado a 32 bytes.
+    // Para secp256k1 la diferencia solo aparece en el diminuto conjunto de hashes >= n,
+    // pero hacerlo correctamente garantiza compatibilidad con vectores RFC6979.
+    const h1Reducido = BigInt("0x" + hashHex) % SECP_N;
+    const h1 = hexABytes(h1Reducido.toString(16).padStart(64, "0"));
     let V = new Uint8Array(32).fill(1), K = new Uint8Array(32);
     K = await hmacSha256(K, concatBytes(V, [0], x, h1));
     V = await hmacSha256(K, V);
@@ -2059,6 +2101,41 @@ function mostrarEstadoFirma(texto, tipo = "") {
     el.className = "estado" + (tipo ? " " + tipo : "");
 }
 
+// --- Clave privada: hex o WIF (Base58Check) ---------------------------
+const BASE58_ALFABETO = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+async function decodificarWIF(wif) {
+    let num = 0n;
+    for (const c of wif) {
+        const i = BASE58_ALFABETO.indexOf(c);
+        if (i < 0) throw new Error("El WIF contiene caracteres no válidos en Base58.");
+        num = num * 58n + BigInt(i);
+    }
+    let hex = num.toString(16);
+    if (hex.length % 2) hex = "0" + hex;
+    hex = "00".repeat(wif.match(/^1*/)[0].length) + hex;   // cada '1' inicial es un byte 0x00
+
+    // 1 (versión) + 32 (clave) [+ 1 (flag comprimida)] + 4 (checksum)
+    if (hex.length !== 74 && hex.length !== 76) throw new Error("Longitud de WIF no válida.");
+    const cuerpo = hex.slice(0, -8);
+    if ((await sha256dHex(cuerpo)).slice(0, 8) !== hex.slice(-8)) {
+        throw new Error("El checksum del WIF no coincide: revisa que lo has copiado completo y sin errores.");
+    }
+    if (cuerpo.slice(0, 2) !== "80") throw new Error("Este WIF no es de mainnet. Esta web solo admite mainnet.");
+    if (cuerpo.length === 66) {
+        throw new Error("Este WIF corresponde a una clave pública sin comprimir (empieza por 5). " +
+                        "P2WPKH exige clave pública comprimida, así que no se puede usar para gastar un UTXO bc1q.");
+    }
+    if (cuerpo.slice(-2) !== "01") throw new Error("Byte de compresión del WIF no válido.");
+    return BigInt("0x" + cuerpo.slice(2, 66));
+}
+
+async function leerClavePrivada(valor) {
+    if (/^[0-9a-fA-F]{64}$/.test(valor)) return BigInt("0x" + valor);
+    if (/^[1-9A-HJ-NP-Za-km-z]{51,52}$/.test(valor)) return decodificarWIF(valor);
+    throw new Error("Formato no reconocido: usa un WIF (51-52 caracteres) o 64 caracteres hexadecimales.");
+}
+
 async function firmarTransaccion() {
     document.getElementById("resultado-firma").style.display = "none";
     const paso6 = document.getElementById("paso6");
@@ -2066,13 +2143,9 @@ async function firmarTransaccion() {
         mostrarEstadoFirma("Primero debes calcular el sighash en el paso 6.", "error");
         return;
     }
-    const claveHex = document.getElementById("clave-privada").value.trim().toLowerCase();
-    if (!/^[0-9a-f]{64}$/.test(claveHex)) {
-        mostrarEstadoFirma("La clave privada debe tener 64 caracteres hexadecimales.", "error");
-        return;
-    }
+    const claveTxt = document.getElementById("clave-privada").value.trim();
     try {
-        const d = BigInt("0x" + claveHex);
+        const d = await leerClavePrivada(claveTxt);
         if (d < 1n || d >= SECP_N) throw new Error("Clave privada fuera de rango.");
 
         const t = reconstruirTxSinFirmar();
@@ -2118,7 +2191,13 @@ async function firmarTransaccion() {
 
 function copiarTxFirmada() {
     const hex = document.getElementById("tx-firmada-hex").textContent;
-    if (navigator.clipboard) navigator.clipboard.writeText(hex).then(() => mostrarEstadoFirma("Hex copiado.", "ok"));
+    if (!navigator.clipboard) {
+        mostrarEstadoFirma("Tu navegador no permite copiar automáticamente: selecciona el hex y cópialo a mano.", "error");
+        return;
+    }
+    navigator.clipboard.writeText(hex)
+        .then(() => mostrarEstadoFirma("Hex copiado.", "ok"))
+        .catch(() => mostrarEstadoFirma("No se ha podido copiar: selecciona el hex y cópialo a mano.", "error"));
 }
 
 
