@@ -14,7 +14,7 @@ En el mundo Bitcoin, la seguridad es lo primero. Esta herramienta ha sido diseñ
 
 - index.html: e45d17e555612c091c1692532ab4dfd7cab450d9c22176297abe66cfa131dae4
 - instrucciones.pdf: e632fd790f8a21b5b5ddaf84d8058ddfa2cfb42b238ff4ebfc418b50e262a2d5
-- transaccion.html: 4333fb3fed04e9f95d990c0aa637f34ec905abf7f03f1f22db93eea9529ee5b4
+- transaccion.html: d1ad23865c4a6f2225253cc8a184ca6ba15df1e46e3ee36a7f1792e620731a2a
 - billeterahd.html: a78a20311d723e79672b1e50703ec659e2cad2df959a1bfbc6c4a08449d51fc1
 
 ## 🔌 Uso Seguro en Modo Offline (Recomendado)
