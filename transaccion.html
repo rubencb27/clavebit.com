@@ -1,14 +1,22 @@
-<!DOCTYPE html>
+<!--
+  Copyright (c) 2026 clavebit.com
+  Licensed under the MIT License.
+  Open Source: https://github.com/rubencb27/clavebit.com
+  
+  EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO.
+--><!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Generador de transacciones Bitcoin | ClaveBit</title>
+ <!-- UN UNICO CSP CONSOLIDADO Y CORREGIDO -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://mempool.space; object-src 'none'; img-src 'self' data:; base-uri 'none'; form-action 'none';">	
+
 <meta name="description" content="Construye una transacción Bitcoin P2WPKH paso a paso con ClaveBit.">
 <link rel="icon" href="./favicon.ico" type="image/x-icon">
 <link rel="canonical" href="https://clavebit.com/transaccion.html">
-<meta http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://mempool.space; object-src 'none'; img-src 'self' data:; base-uri 'none'; form-action 'none';">
+
 <style>
 
         .crypto-generator-container {
@@ -385,10 +393,10 @@
             color: #64748b;
         }
 
-        @media (max-width: 600px) {
-            .resultado-grid { grid-template-columns: 1fr !important; }
-            .crypto-generator-container { padding: 16px; margin: 10px; }
-        }
+@media (max-width: 600px) {
+    .resultado-grid { grid-template-columns: 1fr !important; }
+    .crypto-generator-container { padding: 24px 16px; margin: 20px 10px; }
+}
 
 </style>
 </head>
@@ -408,12 +416,13 @@
 		
 		   <p class="main-descripcion" style="color: #f7931a;">&gt;&gt; <a href="https://clavebit.com" rel="noopener" style="text-decoration: none; color: orange;">Clave privada, pública y dirección</a></p> 
 
-       
+         <a href="bitcoin:bc1q8tzdrqrpl9p33xc5cvk2an68cct7ep58eqklx7"
+   style="position: fixed; top: 16px; right: 16px; text-decoration: none; font-size: 1.2rem; color: #f7931a; font-weight: bold;">Donar con Bitcoin</a>
 
         <h1 class="main-titulo">Generador de transacciones Bitcoin</h1>
         <p class="main-descripcion">
             Construye una transacción Bitcoin paso a paso. Empezamos seleccionando un UTXO
-            P2WPKH (bc1q) que queremos gastar.
+            P2WPKH (bc1q) que queremos gastar. <a href="./Instrucciones para el generador de transacciones Bitcoin.pdf" download style="text-decoration: none; color: red;"><b>Instrucciones</b></a> de uso y seguridad
         </p>
     </div>
 
