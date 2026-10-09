@@ -12,10 +12,9 @@ En el mundo Bitcoin, la seguridad es lo primero. Esta herramienta ha sido diseñ
 *   **Tag de CSP en el HTML** (Respaldo Local)
 *   **Huellas SHA-256 de los archivos** 
 
-- index.html: e45d17e555612c091c1692532ab4dfd7cab450d9c22176297abe66cfa131dae4
-- instrucciones.pdf: e632fd790f8a21b5b5ddaf84d8058ddfa2cfb42b238ff4ebfc418b50e262a2d5
-- transaccion.html: d1ad23865c4a6f2225253cc8a184ca6ba15df1e46e3ee36a7f1792e620731a2a
-- billeterahd.html: a78a20311d723e79672b1e50703ec659e2cad2df959a1bfbc6c4a08449d51fc1
+- index.html: fceaddd3090309580c99a3990fae47e1f4245b1e6bc2be171958979028756a1d
+- transaccion.html: c959f6b261bd404b8c8d198399236e10497049be6240f022f5bef67e5f5ba233
+- billeterahd.html: 349edf02e6e57b90a96d881ee6792f7450ce7d10e739f96e6fecf53cd9cec118
 
 ## 🔌 Uso Seguro en Modo Offline (Recomendado)
 
